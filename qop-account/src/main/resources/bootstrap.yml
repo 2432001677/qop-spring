@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: qop-account
+  cloud:
+    nacos:
+      config:
+        server-addr: 106.53.136.182:8848
+        file-extension: yaml
