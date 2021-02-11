@@ -1,8 +1,8 @@
-package cn.edu.zucc.service.impl;
+package cn.edu.zucc.service.account.impl;
 
 import cn.edu.zucc.pojo.QopUser;
 import cn.edu.zucc.repository.QopUserRepository;
-import cn.edu.zucc.service.QopUserService;
+import cn.edu.zucc.service.account.QopUserService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

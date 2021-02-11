@@ -4,35 +4,40 @@ package cn.edu.zucc.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.annotation.Resource;
 
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
+    public static final String API_DIRECTORY = "cn.edu.zucc.controller";
+
     @Value("${swagger.enable}")
     private boolean swaggerEnable;
 
     @Value("${spring.application.name}")
     private String name;
 
-    @Resource
-    private ApiInfo apiInfo;
-
     @Bean
     public Docket docket() {
+        Contact contact = new Contact("BruceYu", "https://github.com/2432001677", "2432001677@qq.com");
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title("qop")
+                .contact(contact)
+                .build();
         return new Docket(DocumentationType.SWAGGER_2)
                 .enable(swaggerEnable)
                 .apiInfo(apiInfo)
                 .groupName(name)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(SwaggerCommonConfig.apiDirectory))
+                .apis(RequestHandlerSelectors.basePackage(API_DIRECTORY))
                 .paths(PathSelectors.any())
                 .build();
     }

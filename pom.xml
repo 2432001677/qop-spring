@@ -15,6 +15,7 @@
     <module>qop-group</module>
     <module>qop-common</module>
     <module>qop-gateway</module>
+    <module>qop-service</module>
   </modules>
 
   <packaging>pom</packaging>

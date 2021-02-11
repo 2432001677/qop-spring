@@ -1,4 +1,4 @@
-package cn.edu.zucc.service;
+package cn.edu.zucc.service.account;
 
 import cn.edu.zucc.pojo.QopUser;
 
