@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>qop-service</artifactId>
+  <artifactId>qop-entity</artifactId>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -17,22 +17,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>cn.edu.zucc</groupId>
-      <artifactId>qop-entity</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>cn.edu.zucc</groupId>
-      <artifactId>qop-dao</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>cn.edu.zucc</groupId>
-      <artifactId>qop-common</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
