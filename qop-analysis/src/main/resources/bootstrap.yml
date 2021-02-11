@@ -1,6 +1,6 @@
 spring:
   application:
-    name: qop-account
+    name: qop-analysis
   cloud:
     nacos:
       server-addr: 106.53.136.182:8848

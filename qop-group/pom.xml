@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>qop-account</artifactId>
+  <artifactId>qop-group</artifactId>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -47,6 +47,10 @@
     <dependency>
       <groupId>com.alibaba.cloud</groupId>
       <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
