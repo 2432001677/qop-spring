@@ -28,7 +28,6 @@
     <cloud.version>Hoxton.SR8</cloud.version>
     <cloud.alibaba.version>2.2.5.RELEASE</cloud.alibaba.version>
     <swagger.version>2.9.2</swagger.version>
-    <fastjson.version>1.2.75</fastjson.version>
   </properties>
 
   <dependencyManagement>
@@ -74,11 +73,6 @@
         <groupId>io.springfox</groupId>
         <artifactId>springfox-swagger-ui</artifactId>
         <version>${swagger.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>fastjson</artifactId>
-        <version>${fastjson.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
