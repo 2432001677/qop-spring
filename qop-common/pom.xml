@@ -18,6 +18,12 @@
 
   <dependencies>
     <dependency>
+      <groupId>cn.edu.zucc</groupId>
+      <artifactId>qop-entity</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
