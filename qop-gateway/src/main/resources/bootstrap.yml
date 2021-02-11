@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: qop-gateway
+  cloud:
+    nacos:
+      server-addr: 106.53.136.182:8848
+      discovery:
+        namespace: ${spring.cloud.nacos.config.namespace}
+      config:
+        file-extension: properties
+        namespace: dev
