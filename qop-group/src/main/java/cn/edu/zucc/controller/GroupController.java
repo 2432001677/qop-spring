@@ -1,6 +1,6 @@
 package cn.edu.zucc.controller;
 
-import cn.edu.zucc.pojo.QopUser;
+import cn.edu.zucc.account.po.QopUser;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

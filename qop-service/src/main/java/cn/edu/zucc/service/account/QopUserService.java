@@ -1,6 +1,6 @@
 package cn.edu.zucc.service.account;
 
-import cn.edu.zucc.pojo.QopUser;
+import cn.edu.zucc.account.po.QopUser;
 
 import java.util.List;
 

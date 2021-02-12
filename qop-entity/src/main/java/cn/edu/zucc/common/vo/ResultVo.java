@@ -1,4 +1,4 @@
-package cn.edu.zucc.vo.common;
+package cn.edu.zucc.common.vo;
 
 import lombok.Builder;
 import lombok.Data;

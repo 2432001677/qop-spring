@@ -1,15 +1,15 @@
 package cn.edu.zucc.utils;
 
 import cn.edu.zucc.constant.ResponseMsg;
-import cn.edu.zucc.vo.common.ResultVo;
+import cn.edu.zucc.common.vo.ResultVo;
 import org.springframework.http.HttpStatus;
 
 /**
  * @author Bruce
  * @since 02-12-2021
  */
-public class Response {
-    public static <T> ResultVo<T> getResponse(Integer code, String msg, T data) {
+public class ResponseBuilder {
+    public static <T> ResultVo<T> buildResponse(Integer code, String msg, T data) {
         return ResultVo.<T>builder()
                 .code(code)
                 .msg(msg)
@@ -17,7 +17,7 @@ public class Response {
                 .build();
     }
 
-    public static <T> ResultVo<T> getSuccessResponse(T data) {
+    public static <T> ResultVo<T> buildSuccessResponse(T data) {
         return ResultVo.<T>builder()
                 .code(HttpStatus.OK.value())
                 .msg(ResponseMsg.SUCCESS)
@@ -25,7 +25,7 @@ public class Response {
                 .build();
     }
 
-    public static <T> ResultVo<T> getErrorResponse(Integer code, Exception e) {
+    public static <T> ResultVo<T> buildErrorResponse(Integer code, Exception e) {
         return ResultVo.<T>builder()
                 .code(code)
                 .msg(e.getMessage())

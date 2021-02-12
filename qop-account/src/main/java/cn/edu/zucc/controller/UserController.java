@@ -1,10 +1,10 @@
 package cn.edu.zucc.controller;
 
 import cn.edu.zucc.exception.UnexpectedException;
-import cn.edu.zucc.pojo.QopUser;
+import cn.edu.zucc.account.po.QopUser;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
-import cn.edu.zucc.utils.Response;
-import cn.edu.zucc.vo.common.ResultVo;
+import cn.edu.zucc.utils.ResponseBuilder;
+import cn.edu.zucc.common.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -30,7 +30,7 @@ public class UserController {
     @ApiOperation("测试MySql")
     @GetMapping
     public ResultVo<List<QopUser>> getAllUsers() {
-        return Response.getSuccessResponse(qopUserService.queryAll());
+        return ResponseBuilder.buildSuccessResponse(qopUserService.queryAll());
     }
 
     @ApiOperation("测试MySql")
