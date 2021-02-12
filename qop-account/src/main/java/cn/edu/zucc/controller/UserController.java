@@ -1,5 +1,6 @@
 package cn.edu.zucc.controller;
 
+import cn.edu.zucc.exception.UnexpectedException;
 import cn.edu.zucc.pojo.QopUser;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import cn.edu.zucc.utils.Response;
@@ -30,5 +31,11 @@ public class UserController {
     @GetMapping
     public ResultVo<List<QopUser>> getAllUsers() {
         return Response.getSuccessResponse(qopUserService.queryAll());
+    }
+
+    @ApiOperation("测试MySql")
+    @GetMapping("/err")
+    public ResultVo<List<QopUser>> getError() {
+        throw new UnexpectedException("lalala");
     }
 }
