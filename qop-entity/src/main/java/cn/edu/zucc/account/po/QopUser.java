@@ -2,16 +2,15 @@ package cn.edu.zucc.account.po;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "qop_user")
 public class QopUser {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(length = 20, nullable = false)
@@ -26,12 +25,12 @@ public class QopUser {
     @Column(length = 50, nullable = false)
     private String password;
 
-    @Column(length = 5)
-    private String userStatus;
-
-    @Column
+    @Column(length = 100)
     private String img;
 
-    @Column(length = 4)
-    private String authority;
+    @Column(length = 5)
+    private String accountStatus;
+
+    @Column
+    private Date createDate;
 }
