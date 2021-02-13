@@ -1,7 +1,9 @@
 package cn.edu.zucc.controller;
 
-import cn.edu.zucc.account.po.QopUser;
-import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
+import cn.edu.zucc.common.vo.ResultVo;
+import cn.edu.zucc.group.po.QopGroup;
+import cn.edu.zucc.service.group.impl.QopGroupServiceImpl;
+import cn.edu.zucc.utils.ResponseBuilder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -18,11 +20,11 @@ import java.util.List;
 @RequestMapping("group")
 public class GroupController {
     @Resource
-    private QopUserServiceImpl qopUserService;
+    private QopGroupServiceImpl qopGroupService;
 
     @ApiOperation("测试MySql")
     @GetMapping
-    public List<QopUser> getAllUsers() {
-        return qopUserService.queryAll();
+    public ResultVo<List<QopGroup>> getAllUsers() {
+        return ResponseBuilder.buildSuccessResponse(qopGroupService.queryAll());
     }
 }

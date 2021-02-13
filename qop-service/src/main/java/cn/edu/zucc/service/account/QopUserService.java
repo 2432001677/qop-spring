@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface QopUserService {
     List<QopUser> queryAll();
+
+    QopUser addUser(QopUser qopUser);
 }
