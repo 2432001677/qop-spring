@@ -8,7 +8,10 @@ import org.springframework.http.HttpStatus;
  * @author Bruce
  * @since 02-12-2021
  */
-public class ResponseBuilder {
+public final class ResponseBuilder {
+    private ResponseBuilder() {
+    }
+
     public static <T> ResultVo<T> buildResponse(Integer code, String msg, T data) {
         return ResultVo.<T>builder()
                 .code(code)
