@@ -6,6 +6,7 @@ import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import cn.edu.zucc.utils.CryptUtils;
 import cn.edu.zucc.utils.ResponseBuilder;
+import cn.edu.zucc.utils.TokenUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -47,7 +49,7 @@ public class UserController {
 
     @ApiOperation("login")
     @PostMapping("/login")
-    public String login(@RequestBody LoginVo lv){
+    public String login(@RequestBody LoginVo lv, HttpServletResponse hsrp){
         String pwd = null;
 
         if (lv.getUserName().matches("@")){
@@ -62,10 +64,11 @@ public class UserController {
             return "login";
         }
 
-        if(!CryptUtils.matchAccountPasswd(pwd,CryptUtils.cryptAccountPasswd(lv.getPassword()))){
+        if(!CryptUtils.matchAccountPasswd(pwd,lv.getPassword())){
             return "login";
         }
-        System.out.println(lv);
+        System.out.println("login");
+        hsrp.addHeader("Authorization",TokenUtils.sign(lv));
         return "index";
     }
 
