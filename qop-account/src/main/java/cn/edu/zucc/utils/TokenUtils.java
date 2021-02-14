@@ -11,6 +11,8 @@ import java.util.Date;
 /**
  * @author Bruce
  * @since 02-14-2021
+ * <p>
+ * 用户登录成功后签发jwt-token
  */
 @Slf4j
 public class TokenUtils {
@@ -20,6 +22,12 @@ public class TokenUtils {
     private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000L; // 有效期24小时
     private static final String TOKEN_SECRET = "naive";
 
+    /**
+     * 签发
+     *
+     * @param loginVo 登录信息
+     * @return token
+     */
     public static String sign(LoginVo loginVo) {
         String token = null;
         try {

@@ -44,11 +44,11 @@ public class SwaggerConfig implements ApplicationListener<WebServerInitializedEv
                 .contact(contact)
                 .build();
         return new Docket(DocumentationType.SWAGGER_2)
-                .enable(swaggerEnable)
+                .enable(swaggerEnable) // swagger开关
                 .apiInfo(apiInfo)
                 .groupName(name)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(API_DIRECTORY))
+                .apis(RequestHandlerSelectors.basePackage(API_DIRECTORY)) // swagger扫描路径
                 .paths(PathSelectors.any())
                 .build();
     }
