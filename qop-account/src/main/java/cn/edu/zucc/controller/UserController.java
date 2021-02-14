@@ -1,6 +1,7 @@
 package cn.edu.zucc.controller;
 
 import cn.edu.zucc.account.po.QopUser;
+import cn.edu.zucc.account.vo.LoginVo;
 import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import cn.edu.zucc.utils.CryptUtils;
@@ -39,4 +40,43 @@ public class UserController {
         qopUser.setPassword(CryptUtils.cryptAccountPasswd(qopUser.getPassword()));
         return ResponseBuilder.buildSuccessResponse(qopUserService.addUser(qopUser));
     }
+
+    /*
+    * 失败返回login
+    * */
+
+    @ApiOperation("login")
+    @PostMapping("/login")
+    public String login(@RequestBody LoginVo lv){
+        String pwd = null;
+
+        if (lv.getUserName().matches("@")){
+            pwd = qopUserService.queryByEmail(lv.getUserName()).getPassword();
+        }else if(lv.getUserName()!=null){
+            pwd = qopUserService.queryByPhone(lv.getUserName()).getPassword();
+        }else{
+            return "login";
+        }
+
+        if(pwd==null){
+            return "login";
+        }
+
+        if(!CryptUtils.matchAccountPasswd(pwd,CryptUtils.cryptAccountPasswd(lv.getPassword()))){
+            return "login";
+        }
+        System.out.println(lv);
+        return "index";
+    }
+
+    @ApiOperation("register")
+    @PostMapping("/register")
+    public String register(@RequestBody QopUser qopUser){
+        qopUser.setPassword(CryptUtils.cryptAccountPasswd(qopUser.getPassword()));
+        System.out.println(qopUser);
+        qopUserService.addUser(qopUser);
+
+        return "index";
+    }
+
 }

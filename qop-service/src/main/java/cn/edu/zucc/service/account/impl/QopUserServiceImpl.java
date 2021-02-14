@@ -26,4 +26,14 @@ public class QopUserServiceImpl implements QopUserService {
     public QopUser addUser(QopUser qopUser) {
         return qopUserRepository.save(qopUser);
     }
+
+    @Override
+    public QopUser queryByPhone(String phoneNum) {
+        return qopUserRepository.getByPhoneNumber(phoneNum);
+    }
+
+    @Override
+    public QopUser queryByEmail(String emailNum) {
+        return qopUserRepository.getByEmail(emailNum);
+    }
 }

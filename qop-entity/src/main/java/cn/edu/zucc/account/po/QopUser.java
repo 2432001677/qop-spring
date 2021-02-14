@@ -22,7 +22,7 @@ public class QopUser {
     @Column(length = 50, unique = true)
     private String email;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 100, nullable = false)
     private String password;
 
     @Column(length = 100)
