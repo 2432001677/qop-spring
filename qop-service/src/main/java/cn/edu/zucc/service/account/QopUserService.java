@@ -7,5 +7,9 @@ import java.util.List;
 public interface QopUserService {
     List<QopUser> queryAll();
 
+    QopUser queryByPhone(String phoneNum);
+
+    QopUser queryByEmail(String emailNum);
+
     QopUser addUser(QopUser qopUser);
 }

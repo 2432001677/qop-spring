@@ -1,6 +1,8 @@
 package cn.edu.zucc.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.DigestUtils;
 
 /**
  * @author Bruce
@@ -9,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
  * 数据加密
  */
 public final class CryptUtils {
+    @Value("${spring.datasource.salt}")
+    private static String salt;
+
     private CryptUtils() {
     }
 
@@ -19,8 +24,12 @@ public final class CryptUtils {
      * @return 密文
      */
     public static String cryptAccountPasswd(String passwd) {
-        return passwd;
+        String str = DigestUtils.md5DigestAsHex(passwd.getBytes())+salt;
+        System.out.println(str);
+        return str;
     }
+
+
 
     /**
      * 账户密文比较
