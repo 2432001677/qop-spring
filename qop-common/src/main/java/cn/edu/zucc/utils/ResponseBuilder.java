@@ -15,11 +15,18 @@ public final class ResponseBuilder {
     private ResponseBuilder() {
     }
 
-    public static <T> ResultVo<T> buildResponse(Integer code, String msg, T data) {
+    public static <T> ResultVo<T> buildResponse(String code, String msg, T data) {
         return ResultVo.<T>builder()
-                .code(Integer.toString(code))
+                .code(code)
                 .msg(msg)
                 .data(data)
+                .build();
+    }
+
+    public static <T> ResultVo<T> buildSuccessResponse() {
+        return ResultVo.<T>builder()
+                .code(Integer.toString(HttpStatus.OK.value()))
+                .msg(ResponseMsg.SUCCESS)
                 .build();
     }
 
@@ -34,8 +41,8 @@ public final class ResponseBuilder {
     /**
      * <strong>异常必须手动定义</strong>
      *
-     * @param e    异常
-     * @param <T>  -
+     * @param e   异常
+     * @param <T> -
      * @return -
      */
     public static <T> ResultVo<T> buildErrorResponse(BaseException e) {

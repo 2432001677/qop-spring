@@ -19,6 +19,9 @@ public class QopGroup {
     @Column(length = 200)
     private String introduction;
 
+    @Column(length = 1)
+    private String deleted;
+
     @Column(length = 100)
     private String img;
 

@@ -10,7 +10,7 @@ create table qop_user
     nick_name      varchar(20) not null comment '昵称',
     phone_number   varchar(50) unique comment '手机号',
     email          varchar(50) unique comment '电子邮箱',
-    password       varchar(50) not null comment '账号密码',
+    password       varchar(100) not null comment '账号密码',
     img            varchar(100),
     account_status varchar(5) default '00' comment '账号状态',
     create_date    datetime   default now() comment '创建时间'
@@ -21,6 +21,7 @@ create table qop_group
     name         varchar(50) not null comment '群组名',
     introduction varchar(200) comment '群组介绍',
     img          varchar(100),
+    deleted      varchar(1) default 'N' comment '是否删除',
     create_date  datetime default now() comment '创建时间'
 );
 create table qop_group_member

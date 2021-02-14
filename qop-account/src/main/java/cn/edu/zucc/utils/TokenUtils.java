@@ -34,6 +34,7 @@ public class TokenUtils {
             var expiresAt = new Date(System.currentTimeMillis() + EXPIRE_TIME);
             token = JWT.create()
                     .withIssuer("angry")
+//                    .withClaim("userId",loginVo.getUserId())
 //                    .withClaim("email", loginVo.getEmail())
 //                    .withClaim("phoneNumber", loginVo.getPhoneNumber())
                     .withExpiresAt(expiresAt)

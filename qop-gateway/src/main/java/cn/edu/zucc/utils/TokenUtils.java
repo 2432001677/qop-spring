@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
  * @since 02-14-2021
  */
 @Slf4j
-public class TokenUtil {
-    private TokenUtil() {
+public class TokenUtils {
+    private TokenUtils() {
     }
 
     private static final String TOKEN_SECRET = "naive";

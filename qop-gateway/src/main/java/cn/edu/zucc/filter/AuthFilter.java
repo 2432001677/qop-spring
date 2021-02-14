@@ -15,6 +15,8 @@ import java.util.List;
 /**
  * @author Bruce
  * @since 02-14-2021
+ * <p>
+ * 全局过滤请求
  */
 @Slf4j
 @Component
