@@ -9,17 +9,9 @@ import java.util.List;
 public interface QopUserService {
     List<QopUser> queryAll();
 
-    QopUser queryByPhone(String phoneNum);
-
-    QopUser queryByEmail(String emailNum);
-
     QopUser addUser(QopUser qopUser);
 
-    QopUser RegistervoToQopUser(RegisterVo registerVo);
+    Long login(LoginVo loginVo);
 
-    void loginErrIf(LoginVo loginVo);
-
-    boolean emailIf(LoginVo loginVo);
-
-
+    void register(RegisterVo registerVo);
 }

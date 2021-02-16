@@ -3,7 +3,9 @@ package cn.edu.zucc.service.account.impl;
 import cn.edu.zucc.account.po.QopUser;
 import cn.edu.zucc.account.vo.LoginVo;
 import cn.edu.zucc.account.vo.RegisterVo;
-import cn.edu.zucc.exception.FormInfoException;
+import cn.edu.zucc.constant.ResponseMsg;
+import cn.edu.zucc.exception.SourceNotFoundException;
+import cn.edu.zucc.exception.WrongPasswordException;
 import cn.edu.zucc.repository.account.QopUserRepository;
 import cn.edu.zucc.service.account.QopUserService;
 import cn.edu.zucc.utils.CryptUtils;
@@ -35,38 +37,23 @@ public class QopUserServiceImpl implements QopUserService {
     }
 
     @Override
-    public QopUser queryByPhone(String phoneNum) {
-        return qopUserRepository.getByPhoneNumber(phoneNum);
+    public Long login(LoginVo loginVo) {
+        String userName = loginVo.getUserName();
+        QopUser qopUser = userName.matches("@") ? qopUserRepository.getByEmail(userName) : qopUserRepository.getByPhoneNumber(userName);
+        if (qopUser == null) {
+            throw new SourceNotFoundException(ResponseMsg.NOT_FOUND_USER);
+        }
+        if (!CryptUtils.matchAccountPasswd(qopUser.getPassword(), loginVo.getPassword())) {
+            throw new WrongPasswordException();
+        }
+        return qopUser.getId();
     }
 
     @Override
-    public QopUser queryByEmail(String emailNum) {
-        return qopUserRepository.getByEmail(emailNum);
-    }
-
-    @Override
-    public QopUser RegistervoToQopUser(RegisterVo registerVo) {
-        registerVo.setPassword(CryptUtils.cryptAccountPasswd(registerVo.getPassword()));
+    public void register(RegisterVo registerVo) {
         QopUser qopUser = new QopUser();
-        BeanUtils.copyProperties(registerVo,qopUser);
-        return qopUser;
+        BeanUtils.copyProperties(registerVo, qopUser);
+        qopUser.setPassword(CryptUtils.cryptAccountPasswd(registerVo.getPassword()));
+        addUser(qopUser);
     }
-
-    @Override
-    public void loginErrIf(LoginVo loginVo) {
-        if(loginVo.getUserName()==null){
-            throw new FormInfoException("用户名为空");
-        }
-
-    }
-
-    @Override
-    public boolean emailIf(LoginVo loginVo) {
-        if (loginVo.getUserName().matches("@")){
-            return true;
-        }
-        return false;
-    }
-
-
 }

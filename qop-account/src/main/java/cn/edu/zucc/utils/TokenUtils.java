@@ -1,6 +1,5 @@
 package cn.edu.zucc.utils;
 
-import cn.edu.zucc.account.vo.LoginVo;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -25,18 +24,16 @@ public class TokenUtils {
     /**
      * 签发
      *
-     * @param loginVo 登录信息
+     * @param userId 登录信息
      * @return token
      */
-    public static String sign(LoginVo loginVo) {
+    public static String sign(Long userId) {
         String token = null;
         try {
             var expiresAt = new Date(System.currentTimeMillis() + EXPIRE_TIME);
             token = JWT.create()
                     .withIssuer("angry")
-//                    .withClaim("userId",loginVo.getUserId())
-//                    .withClaim("email", loginVo.getEmail())
-//                    .withClaim("phoneNumber", loginVo.getPhoneNumber())
+                    .withClaim("userId",userId)
                     .withExpiresAt(expiresAt)
                     .sign(Algorithm.HMAC256(TOKEN_SECRET));
         } catch (IllegalArgumentException | JWTCreationException e) {

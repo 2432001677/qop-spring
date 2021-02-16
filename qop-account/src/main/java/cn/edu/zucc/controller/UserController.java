@@ -4,6 +4,8 @@ import cn.edu.zucc.account.po.QopUser;
 import cn.edu.zucc.account.vo.LoginVo;
 import cn.edu.zucc.account.vo.RegisterVo;
 import cn.edu.zucc.common.vo.ResultVo;
+import cn.edu.zucc.constant.ResponseMsg;
+import cn.edu.zucc.exception.FormInfoException;
 import cn.edu.zucc.exception.WrongPasswordException;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import cn.edu.zucc.utils.CryptUtils;
@@ -12,6 +14,7 @@ import cn.edu.zucc.utils.TokenUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,33 +49,24 @@ public class UserController {
     }
 
     /*
-    * 失败返回login
-    * */
+     * 失败返回login
+     * */
 
     @ApiOperation("login")
     @PostMapping("/login")
-    public  ResultVo<Object> login(@RequestBody LoginVo loginVo, HttpServletResponse hsrp){
-        String pwd = null;
-        qopUserService.loginErrIf(loginVo);
-        if (qopUserService.emailIf(loginVo)){
-            pwd = qopUserService.queryByEmail(loginVo.getUserName()).getPassword();
-        }else {
-            pwd = qopUserService.queryByPhone(loginVo.getUserName()).getPassword();
+    public ResultVo<Void> login(@RequestBody LoginVo loginVo, HttpServletResponse response) {
+        if (loginVo == null || StringUtils.isBlank(loginVo.getUserName()) || StringUtils.isBlank(loginVo.getPassword())) {
+            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        if(CryptUtils.matchAccountPasswd(pwd,loginVo.getPassword())){
-            hsrp.setHeader("Authorization",TokenUtils.sign(loginVo));
-            log.info("Login");
-            return ResponseBuilder.buildSuccessResponse();
-
-        }
-        WrongPasswordException e = new WrongPasswordException("","");
-        return ResponseBuilder.buildErrorResponse(e);
+        response.setHeader("Authorization", TokenUtils.sign(qopUserService.login(loginVo)));
+        log.info("Login");
+        return ResponseBuilder.buildSuccessResponse();
     }
 
     @ApiOperation("register")
     @PostMapping("/register")
-    public ResultVo<QopUser> register(@RequestBody RegisterVo registerVo){
-        return ResponseBuilder.buildSuccessResponse(qopUserService.addUser(qopUserService.RegistervoToQopUser(registerVo)));
+    public ResultVo<Void> register(@RequestBody RegisterVo registerVo) {
+        qopUserService.register(registerVo);
+        return ResponseBuilder.buildSuccessResponse();
     }
-
 }
