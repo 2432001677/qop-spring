@@ -11,13 +11,13 @@ import java.util.Date;
 public class QopGroupMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false,length = 20)
-    private long groupId;
+    private Long groupId;
 
     @Column(nullable = false,length = 20)
-    private long userId;
+    private Long userId;
 
     @Column(nullable = false,length = 20)
     private String userRole;

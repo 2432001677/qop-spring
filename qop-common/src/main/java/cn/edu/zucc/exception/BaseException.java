@@ -7,10 +7,10 @@ package cn.edu.zucc.exception;
  * <p>
  * 所有自定义异常需要继承它
  */
-public class BaseException extends RuntimeException {
+public abstract class BaseException extends RuntimeException {
     private final String code;
 
-    public BaseException(String msg, String code) {
+    BaseException(String msg, String code) {
         super(msg);
         this.code = code;
     }

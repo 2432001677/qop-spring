@@ -9,10 +9,13 @@ import cn.edu.zucc.exception.UnAuthorizedException;
 import cn.edu.zucc.group.po.QopGroup;
 import cn.edu.zucc.group.po.QopGroupMember;
 import cn.edu.zucc.group.vo.GroupInfoVo;
+import cn.edu.zucc.group.vo.GroupMemberInfoVo;
 import cn.edu.zucc.repository.group.QopGroupMemberRepository;
 import cn.edu.zucc.repository.group.QopGroupRepository;
 import cn.edu.zucc.service.group.QopGroupService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +61,23 @@ public class QopGroupServiceImpl implements QopGroupService {
         return groupInfoVo;
     }
 
+    @Override
+    public void updateGroupInfo(GroupInfoVo groupInfoVo, Long userId) {
+        if (groupInfoVo == null || groupInfoVo.getId() == null || StringUtils.isBlank(groupInfoVo.getGroupName()) || userId == null) {
+            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+        }
+        QopGroupMember qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupInfoVo.getId(), userId);
+        if (qopGroupMember == null) {
+            throw new SourceNotFoundException(ResponseMsg.GROUP_NOT_FOUND);
+        }
+
+        QopGroup qopGroup = new QopGroup();
+        qopGroup.setName(groupInfoVo.getGroupName());
+        qopGroup.setIntroduction(groupInfoVo.getIntroduction());
+        qopGroup.setImg(groupInfoVo.getImg());
+        qopGroupRepository.save(qopGroup);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteGroup(Long groupId, Long userId) {
@@ -73,5 +93,10 @@ public class QopGroupServiceImpl implements QopGroupService {
         }
         qopGroupMemberRepository.deleteByGroupId(groupId);
         qopGroupRepository.deleteQopGroup(groupId);
+    }
+
+    @Override
+    public Page<GroupMemberInfoVo> getGroupMembers(Long groupId, Long userId, Pageable pageable) {
+        return qopGroupMemberRepository.findGroupMemberInfoVoPageList(groupId, pageable);
     }
 }
