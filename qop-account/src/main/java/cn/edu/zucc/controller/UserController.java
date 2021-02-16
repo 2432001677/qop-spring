@@ -2,7 +2,9 @@ package cn.edu.zucc.controller;
 
 import cn.edu.zucc.account.po.QopUser;
 import cn.edu.zucc.account.vo.LoginVo;
+import cn.edu.zucc.account.vo.RegisterVo;
 import cn.edu.zucc.common.vo.ResultVo;
+import cn.edu.zucc.exception.BaseException;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import cn.edu.zucc.utils.CryptUtils;
 import cn.edu.zucc.utils.ResponseBuilder;
@@ -10,6 +12,7 @@ import cn.edu.zucc.utils.TokenUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,37 +52,36 @@ public class UserController {
 
     @ApiOperation("login")
     @PostMapping("/login")
-    public String login(@RequestBody LoginVo lv, HttpServletResponse hsrp){
+    public  <T> ResultVo<Object> login(@RequestBody LoginVo lv, HttpServletResponse hsrp){
         String pwd = null;
 
         if (lv.getUserName().matches("@")){
             pwd = qopUserService.queryByEmail(lv.getUserName()).getPassword();
         }else if(lv.getUserName()!=null){
             pwd = qopUserService.queryByPhone(lv.getUserName()).getPassword();
-        }else{
-            return "login";
         }
 
         if(pwd==null){
-            return "login";
+            return ResponseBuilder.buildErrorResponse(new BaseException("无该用户",""));
         }
 
         if(!CryptUtils.matchAccountPasswd(pwd,lv.getPassword())){
-            return "login";
+            return ResponseBuilder.buildErrorResponse(new BaseException("登陆失败",""));
         }
-        System.out.println("login");
+        log.info("login");
         hsrp.addHeader("Authorization",TokenUtils.sign(lv));
-        return "index";
+        return ResponseBuilder.buildSuccessResponse();
     }
 
     @ApiOperation("register")
     @PostMapping("/register")
-    public String register(@RequestBody QopUser qopUser){
-        qopUser.setPassword(CryptUtils.cryptAccountPasswd(qopUser.getPassword()));
-        System.out.println(qopUser);
-        qopUserService.addUser(qopUser);
+    public ResultVo<QopUser> register(@RequestBody RegisterVo registerVo){
+        registerVo.setPassword(CryptUtils.cryptAccountPasswd(registerVo.getPassword()));
+        QopUser qopUser = new QopUser();
+        BeanUtils.copyProperties(registerVo,qopUser);
 
-        return "index";
+
+        return ResponseBuilder.buildSuccessResponse(qopUserService.addUser(qopUser));
     }
 
 }
