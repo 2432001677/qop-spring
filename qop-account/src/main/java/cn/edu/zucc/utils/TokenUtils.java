@@ -33,7 +33,7 @@ public class TokenUtils {
             var expiresAt = new Date(System.currentTimeMillis() + EXPIRE_TIME);
             token = JWT.create()
                     .withIssuer("angry")
-                    .withClaim("userId",userId)
+                    .withClaim("userId", userId)
                     .withExpiresAt(expiresAt)
                     .sign(Algorithm.HMAC256(TOKEN_SECRET));
         } catch (IllegalArgumentException | JWTCreationException e) {

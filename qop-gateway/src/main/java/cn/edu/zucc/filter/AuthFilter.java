@@ -1,5 +1,6 @@
 package cn.edu.zucc.filter;
 
+import cn.edu.zucc.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -33,7 +34,7 @@ public class AuthFilter implements GlobalFilter {
         }
         log.info(url);
         var authorizations = request.getHeaders().get("Authorization");
-        if (CollectionUtils.isEmpty(authorizations)) {
+        if (CollectionUtils.isEmpty(authorizations) || !TokenUtils.verify(authorizations.get(0))) {
             log.info("not authorized");
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return response.setComplete();
