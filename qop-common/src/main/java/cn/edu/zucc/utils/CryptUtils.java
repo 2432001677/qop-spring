@@ -24,12 +24,8 @@ public final class CryptUtils {
      * @return 密文
      */
     public static String cryptAccountPasswd(String passwd) {
-        String str = DigestUtils.md5DigestAsHex(passwd.getBytes())+salt;
-        System.out.println(str);
-        return str;
+        return DigestUtils.md5DigestAsHex((passwd + salt).getBytes());
     }
-
-
 
     /**
      * 账户密文比较
