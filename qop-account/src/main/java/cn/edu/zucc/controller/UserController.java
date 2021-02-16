@@ -8,6 +8,7 @@ import cn.edu.zucc.exception.WrongPasswordException;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import cn.edu.zucc.utils.CryptUtils;
 import cn.edu.zucc.utils.ResponseBuilder;
+import cn.edu.zucc.utils.TokenUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -58,8 +59,13 @@ public class UserController {
         }else {
             pwd = qopUserService.queryByPhone(loginVo.getUserName()).getPassword();
         }
+        if(CryptUtils.matchAccountPasswd(pwd,loginVo.getPassword())){
+            hsrp.setHeader("Authorization",TokenUtils.sign(loginVo));
+            log.info("Login");
+            return ResponseBuilder.buildSuccessResponse();
 
-       WrongPasswordException e = new WrongPasswordException("","");
+        }
+        WrongPasswordException e = new WrongPasswordException("","");
         return ResponseBuilder.buildErrorResponse(e);
     }
 
