@@ -14,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,6 +54,12 @@ public class QopUserServiceImpl implements QopUserService {
     public void register(RegisterVo registerVo) {
         QopUser qopUser = new QopUser();
         BeanUtils.copyProperties(registerVo, qopUser);
+        if (registerVo.getUserName().matches("@")) {
+            qopUser.setEmail(registerVo.getUserName());
+        } else {
+            qopUser.setPhoneNumber(registerVo.getUserName());
+        }
+        qopUser.setCreateDate(new Date());
         qopUser.setPassword(CryptUtils.cryptAccountPasswd(registerVo.getPassword()));
         addUser(qopUser);
     }

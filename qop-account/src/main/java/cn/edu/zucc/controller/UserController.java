@@ -6,7 +6,6 @@ import cn.edu.zucc.account.vo.RegisterVo;
 import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.exception.FormInfoException;
-import cn.edu.zucc.exception.WrongPasswordException;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import cn.edu.zucc.utils.CryptUtils;
 import cn.edu.zucc.utils.ResponseBuilder;
@@ -66,6 +65,9 @@ public class UserController {
     @ApiOperation("register")
     @PostMapping("/register")
     public ResultVo<Void> register(@RequestBody RegisterVo registerVo) {
+        if (registerVo == null || StringUtils.isBlank(registerVo.getUserName()) || StringUtils.isBlank(registerVo.getNickName()) || StringUtils.isBlank(registerVo.getPassword())) {
+            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+        }
         qopUserService.register(registerVo);
         return ResponseBuilder.buildSuccessResponse();
     }
