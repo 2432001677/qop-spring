@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author Bruce
@@ -26,11 +25,6 @@ import java.util.List;
 public class QopUserServiceImpl implements QopUserService {
     @Resource
     private QopUserRepository qopUserRepository;
-
-    @Override
-    public List<QopUser> queryAll() {
-        return qopUserRepository.findAll();
-    }
 
     @Override
     public QopUser addUser(QopUser qopUser) {

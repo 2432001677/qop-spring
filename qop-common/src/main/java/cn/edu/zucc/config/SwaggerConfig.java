@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import java.net.UnknownHostException;
  */
 @Slf4j
 @Configuration
+@RefreshScope
 @EnableSwagger2
 public class SwaggerConfig implements ApplicationListener<WebServerInitializedEvent> {
     public static final String API_DIRECTORY = "cn.edu.zucc.controller";

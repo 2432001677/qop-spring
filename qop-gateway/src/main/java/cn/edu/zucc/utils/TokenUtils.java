@@ -16,18 +16,13 @@ public class TokenUtils {
     private TokenUtils() {
     }
 
-    private static final String TOKEN_SECRET = "naive";
-
-    public static boolean verify(String token) {
+    public static boolean verify(String token, String tokenSecret, String issuer) {
         try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).withIssuer("angry").build();
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(tokenSecret)).withIssuer(issuer).build();
             DecodedJWT jwt = verifier.verify(token);
-            log.debug("verify access");
-            log.debug(jwt.getClaim("email").asString());
-            log.debug(jwt.getClaim("phoneNumber").asString());
-            log.debug("expiration at " + jwt.getExpiresAt());
+            log.info("verify access: " + jwt.getClaim("userId").asLong());
+            log.info("expiration at " + jwt.getExpiresAt());
         } catch (IllegalArgumentException | JWTVerificationException e) {
-            log.error(e.getMessage(), e);
             return false;
         }
         return true;

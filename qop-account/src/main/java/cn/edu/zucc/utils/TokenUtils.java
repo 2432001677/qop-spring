@@ -19,7 +19,6 @@ public class TokenUtils {
     }
 
     private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000L; // 有效期24小时
-    private static final String TOKEN_SECRET = "naive";
 
     /**
      * 签发
@@ -27,15 +26,15 @@ public class TokenUtils {
      * @param userId 登录信息
      * @return token
      */
-    public static String sign(Long userId) {
+    public static String sign(Long userId, String tokenSecret, String issuer) {
         String token = null;
         try {
             var expiresAt = new Date(System.currentTimeMillis() + EXPIRE_TIME);
             token = JWT.create()
-                    .withIssuer("angry")
+                    .withIssuer(issuer)
                     .withClaim("userId", userId)
                     .withExpiresAt(expiresAt)
-                    .sign(Algorithm.HMAC256(TOKEN_SECRET));
+                    .sign(Algorithm.HMAC256(tokenSecret));
         } catch (IllegalArgumentException | JWTCreationException e) {
             log.error(e.getMessage(), e);
         }

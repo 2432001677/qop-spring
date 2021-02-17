@@ -14,13 +14,11 @@ public class TokenUtils {
     private TokenUtils() {
     }
 
-    private static final String TOKEN_SECRET = "naive";
-
-    public static DecodedJWT getJwt(String token) {
-        return JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).withIssuer("angry").build().verify(token);
+    public static DecodedJWT getJwt(String token, String tokenSecret, String issuer) {
+        return JWT.require(Algorithm.HMAC256(tokenSecret)).withIssuer(issuer).build().verify(token);
     }
 
-    public static Long getUserId(String token) {
-        return getJwt(token).getClaim("userId").asLong();
+    public static Long getUserId(String token, String tokenSecret, String issuer) {
+        return getJwt(token, tokenSecret, issuer).getClaim("userId").asLong();
     }
 }
