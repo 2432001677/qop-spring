@@ -8,11 +8,13 @@ import cn.edu.zucc.utils.TokenUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
 @Api(tags = "小组管理")
+@RefreshScope
 @RestController
 @RequestMapping("manage")
 public class GroupManagementController {
