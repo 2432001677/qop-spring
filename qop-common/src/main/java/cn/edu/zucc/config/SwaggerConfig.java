@@ -2,13 +2,12 @@ package cn.edu.zucc.config;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -29,7 +28,7 @@ import java.net.UnknownHostException;
 @Configuration
 @RefreshScope
 @EnableSwagger2
-public class SwaggerConfig implements ApplicationListener<WebServerInitializedEvent> {
+public class SwaggerConfig {
     public static final String API_DIRECTORY = "cn.edu.zucc.controller";
 
     @Value("${swagger.enable}")
@@ -55,13 +54,13 @@ public class SwaggerConfig implements ApplicationListener<WebServerInitializedEv
                 .build();
     }
 
-    @Override
-    public void onApplicationEvent(@NonNull WebServerInitializedEvent webServerInitializedEvent) {
+    @EventListener(WebServerInitializedEvent.class)
+    public void onWebServerReady(WebServerInitializedEvent event) {
         if (!swaggerEnable) {
             return;
         }
-        var port = webServerInitializedEvent.getWebServer().getPort();
-        var applicationName = webServerInitializedEvent.getApplicationContext().getApplicationName();
+        var port = event.getWebServer().getPort();
+        var applicationName = event.getApplicationContext().getApplicationName();
         try {
             log.info("swagger-ui已开启");
             log.info("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + applicationName + "/swagger-ui.html");
