@@ -46,4 +46,16 @@ public class GroupManagementController {
         qopGroupService.deleteGroup(groupId, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
+
+    @ApiOperation("改变成员权限")
+    @PostMapping("/change-role")
+    public ResultVo<Void> changeMemberRole() {
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("删除组成员")
+    @PostMapping("/delete-member")
+    public ResultVo<Void> deleteGroupMembers() {
+        return ResponseBuilder.buildSuccessResponse();
+    }
 }
