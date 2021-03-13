@@ -25,7 +25,7 @@ import java.util.List;
 @Component
 @RefreshScope
 public class AuthFilter implements GlobalFilter {
-    private static final List<String> whiteList = Arrays.asList("/user/login", "/user/register");
+    private static final List<String> whiteList = Arrays.asList("/user/login", "/user/register", "/user/password");
 
     @Value("${jwt.issuer}")
     private String issuer;

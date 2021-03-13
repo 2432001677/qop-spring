@@ -31,9 +31,9 @@ public class MongoClassConverter {
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return converter;
     }
-
-    @Bean
-    MongoTransactionManager transactionManager() {
-        return new MongoTransactionManager(mongoDatabaseFactory);
-    }
+//  MongoDB搭建复制集时可开启事务
+//    @Bean
+//    MongoTransactionManager transactionManager() {
+//        return new MongoTransactionManager(mongoDatabaseFactory);
+//    }
 }

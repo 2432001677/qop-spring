@@ -1,12 +1,16 @@
 package cn.edu.zucc.controller;
 
+import cn.edu.zucc.account.vo.AccountProfilesVo;
+import cn.edu.zucc.account.vo.ChangePasswordVo;
 import cn.edu.zucc.account.vo.LoginVo;
 import cn.edu.zucc.account.vo.RegisterVo;
 import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.exception.FormInfoException;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
+import cn.edu.zucc.utils.FormatUtils;
 import cn.edu.zucc.utils.ResponseBuilder;
+import cn.edu.zucc.utils.TokenProviderUtils;
 import cn.edu.zucc.utils.TokenUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,10 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -47,8 +48,7 @@ public class UserController {
         if (loginVo == null || StringUtils.isBlank(loginVo.getUserName()) || StringUtils.isBlank(loginVo.getPassword())) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        response.setHeader("Authorization", TokenUtils.sign(qopUserService.login(loginVo), tokenSecret, issuer));
-        log.info("Login");
+        response.setHeader("Authorization", TokenProviderUtils.sign(qopUserService.login(loginVo), tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
 
@@ -59,6 +59,61 @@ public class UserController {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
         qopUserService.register(registerVo);
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("获取头像")
+    @GetMapping("/icon")
+    public ResultVo<Void> previewIcon() {
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("更新头像")
+    @PostMapping("/icon")
+    public ResultVo<Void> updateIcon() {
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("获取个人资料")
+    @GetMapping("/profiles")
+    public ResultVo<AccountProfilesVo> getMyProfiles(@RequestHeader("Authorization") String token) {
+        return ResponseBuilder.buildSuccessResponse(qopUserService.getProfilesById(TokenUtils.getUserId(token, tokenSecret, issuer)));
+    }
+
+    @ApiOperation("更新个人资料")
+    @PostMapping("/profiles")
+    public ResultVo<Void> updateMyProfiles(@RequestHeader("Authorization") String token,
+                                           @RequestBody AccountProfilesVo accountProfilesVo) {
+        qopUserService.updateProfilesById(accountProfilesVo, TokenUtils.getUserId(token, tokenSecret, issuer));
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("更新手机号")
+    @PostMapping("/phone-number/{phoneNumber}")
+    public ResultVo<Void> updateMyPhoneNumber(@RequestHeader("Authorization") String token,
+                                              @PathVariable String phoneNumber) {
+        if (!FormatUtils.isPhoneNumber(phoneNumber)) {
+            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+        }
+        qopUserService.updatePhoneNumberById(phoneNumber, TokenUtils.getUserId(token, tokenSecret, issuer));
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("更新邮箱")
+    @PostMapping("/email/{email}")
+    public ResultVo<Void> updateMyEmail(@RequestHeader("Authorization") String token,
+                                        @PathVariable String email) {
+        if (!FormatUtils.isEmail(email)) {
+            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+        }
+        qopUserService.updateEmailById(email, TokenUtils.getUserId(token, tokenSecret, issuer));
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("更新密码")
+    @PostMapping("/password")
+    public ResultVo<Void> updateMyPassword(@RequestBody ChangePasswordVo changePasswordVo) {
+        qopUserService.changePassword(changePasswordVo);
         return ResponseBuilder.buildSuccessResponse();
     }
 }

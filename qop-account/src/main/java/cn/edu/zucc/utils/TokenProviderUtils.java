@@ -14,8 +14,8 @@ import java.util.Date;
  * 用户登录成功后签发jwt-token
  */
 @Slf4j
-public class TokenUtils {
-    private TokenUtils() {
+public class TokenProviderUtils {
+    private TokenProviderUtils() {
     }
 
     private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000L; // 有效期24小时

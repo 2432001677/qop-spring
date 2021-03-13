@@ -40,13 +40,6 @@ public class GroupManagementController {
         return ResponseBuilder.buildSuccessResponse();
     }
 
-    @ApiOperation("解散小组")
-    @GetMapping("/delete")
-    public ResultVo<Void> deleteGroup(@RequestHeader("Authorization") String token, @RequestParam(value = "groupId") Long groupId) {
-        qopGroupService.deleteGroup(groupId, TokenUtils.getUserId(token, tokenSecret, issuer));
-        return ResponseBuilder.buildSuccessResponse();
-    }
-
     @ApiOperation("改变成员权限")
     @PostMapping("/change-role")
     public ResultVo<Void> changeMemberRole() {
@@ -56,6 +49,13 @@ public class GroupManagementController {
     @ApiOperation("删除组成员")
     @PostMapping("/delete-member")
     public ResultVo<Void> deleteGroupMembers() {
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("解散小组")
+    @GetMapping("/delete")
+    public ResultVo<Void> deleteGroup(@RequestHeader("Authorization") String token, @RequestParam(value = "groupId") Long groupId) {
+        qopGroupService.deleteGroup(groupId, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
 }

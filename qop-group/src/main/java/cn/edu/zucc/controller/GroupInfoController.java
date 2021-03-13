@@ -47,6 +47,12 @@ public class GroupInfoController {
         return ResponseBuilder.buildSuccessPageableResponse(qopGroupService.getGroupMembers(groupId, TokenUtils.getUserId(token, tokenSecret, issuer), PageRequest.of(page - 1, size)));
     }
 
+    @ApiOperation("邀请加入组")
+    @PostMapping("/invite")
+    public ResultVo<Void> inviteToGroup() {
+        return ResponseBuilder.buildSuccessResponse();
+    }
+
     @ApiOperation("加入组")
     @PostMapping("/join")
     public ResultVo<Void> joinGroup() {
@@ -56,12 +62,6 @@ public class GroupInfoController {
     @ApiOperation("离开组")
     @PostMapping("/leave")
     public ResultVo<Void> leaveGroup() {
-        return ResponseBuilder.buildSuccessResponse();
-    }
-
-    @ApiOperation("邀请加入组")
-    @PostMapping("/invite")
-    public ResultVo<Void> inviteToGroup() {
         return ResponseBuilder.buildSuccessResponse();
     }
 }
