@@ -11,7 +11,7 @@ import java.util.Map;
 @Data
 public class Question {
     private String qtype;
-    private Boolean require;
     private String qtitle;
+    private Boolean require;
     private Map<String, String> options;
 }

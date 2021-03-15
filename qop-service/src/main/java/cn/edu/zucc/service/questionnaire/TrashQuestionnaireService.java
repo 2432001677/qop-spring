@@ -1,6 +1,6 @@
 package cn.edu.zucc.service.questionnaire;
 
-import cn.edu.zucc.questionnaire.po.QopTrashQuestionnaire;
+import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import org.springframework.data.domain.Page;
 
 public interface TrashQuestionnaireService {
@@ -12,7 +12,7 @@ public interface TrashQuestionnaireService {
      * @param size
      * @return
      */
-    Page<QopTrashQuestionnaire> queryTrashPageQuestionnaire(int uid, int page, int size);
+    Page<QuestionnaireInfoVo> queryTrashPageQuestionnaire(int uid, int page, int size);
 
     void clear(int uid);
 }

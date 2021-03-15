@@ -17,4 +17,8 @@ public interface QopGroupService {
     void deleteGroup(Long groupId, Long userId);
 
     Page<GroupMemberInfoVo> getGroupMembers(Long groupId, Long userId, Pageable pageable);
+
+    Page<GroupInfoVo> getGroupsById(Long userId, Pageable pageable);
+
+    void leaveGroup(Long groupId, Long userId);
 }

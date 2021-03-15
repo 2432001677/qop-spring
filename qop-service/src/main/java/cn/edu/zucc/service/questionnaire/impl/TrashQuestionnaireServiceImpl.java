@@ -1,6 +1,6 @@
 package cn.edu.zucc.service.questionnaire.impl;
 
-import cn.edu.zucc.questionnaire.po.QopTrashQuestionnaire;
+import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import cn.edu.zucc.service.questionnaire.TrashQuestionnaireService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TrashQuestionnaireServiceImpl implements TrashQuestionnaireService {
     @Override
-    public Page<QopTrashQuestionnaire> queryTrashPageQuestionnaire(int uid, int page, int size) {
+    public Page<QuestionnaireInfoVo> queryTrashPageQuestionnaire(int uid, int page, int size) {
         return null;
     }
 

@@ -27,6 +27,10 @@ public class QopQuestionnaire {
     private String description;
     @Field("create_time")
     private Date createTime;
+    @Field("delete_time")
+    private Date deleteTime;
+    @Field("question_num")
+    private Integer questionNum;
     @Field("questions")
     private List<Question> questions;
 }

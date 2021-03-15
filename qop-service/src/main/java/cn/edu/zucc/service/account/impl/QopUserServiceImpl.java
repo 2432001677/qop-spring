@@ -78,13 +78,13 @@ public class QopUserServiceImpl implements QopUserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updatePhoneNumberById(String phoneNumber, Long id) {
         qopUserRepository.updatePhoneById(phoneNumber, id);
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateEmailById(String email, Long id) {
         qopUserRepository.updateEmailById(email, id);
     }

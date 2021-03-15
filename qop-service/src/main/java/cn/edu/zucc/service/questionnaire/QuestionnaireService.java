@@ -1,26 +1,23 @@
 package cn.edu.zucc.service.questionnaire;
 
-import cn.edu.zucc.questionnaire.po.QopQuestionnaire;
-import cn.edu.zucc.questionnaire.po.QopTrashQuestionnaire;
+import cn.edu.zucc.questionnaire.vo.PublishQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QopQuestionnaireVo;
+import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface QuestionnaireService {
-    QopQuestionnaire getQuestionnaire(String id);
+    QopQuestionnaireVo getQuestionnaire(String id, Integer status);
 
-    QopQuestionnaire addQuestionnaire(QopQuestionnaireVo beanQuestionnaire);
+    Page<QuestionnaireInfoVo> getMyQuestionnaires(Long uid, Pageable pageable);
 
-    void deleteQuestionnaire(QopQuestionnaireVo beanQuestionnaire);
+    void addQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, Long uid);
 
-    QopQuestionnaire updateQuestionnaire(QopQuestionnaireVo beanQuestionnaire);
+    QuestionnaireInfoVo publishQuestionnaire(PublishQuestionnaireVo publishQuestionnaireVo, Long uid);
 
-    Page<QopQuestionnaire> pageQuestionnaire(int uid, int page, int size);
+    void deleteQuestionnaire(String id, Long uid);
 
-    /**
-     * 移入垃圾箱
-     *
-     * @param trashQuestionnaire
-     * @return
-     */
-    QopTrashQuestionnaire addToTrash(QopTrashQuestionnaire trashQuestionnaire);
+    void updateQuestionnaireInfo(QuestionnaireInfoVo questionnaireInfoVo, Long uid);
+
+    void updateQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, Long uid);
 }

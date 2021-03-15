@@ -65,12 +65,14 @@ public class UserController {
     @ApiOperation("获取头像")
     @GetMapping("/icon")
     public ResultVo<Void> previewIcon() {
+        //todo
         return ResponseBuilder.buildSuccessResponse();
     }
 
     @ApiOperation("更新头像")
     @PostMapping("/icon")
     public ResultVo<Void> updateIcon() {
+        //todo
         return ResponseBuilder.buildSuccessResponse();
     }
 

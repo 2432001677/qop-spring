@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -57,7 +58,7 @@ public class QopGroupServiceImpl implements QopGroupService {
         qopGroupMember.setJoinDate(nowDate);
         qopGroupMemberRepository.save(qopGroupMember);
 
-        groupInfoVo.setId(res.getId());
+        groupInfoVo.setId(new BigInteger(res.getId().toString()));
         return groupInfoVo;
     }
 
@@ -66,7 +67,7 @@ public class QopGroupServiceImpl implements QopGroupService {
         if (groupInfoVo == null || groupInfoVo.getId() == null || StringUtils.isBlank(groupInfoVo.getGroupName()) || userId == null) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        QopGroupMember qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupInfoVo.getId(), userId);
+        QopGroupMember qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupInfoVo.getId().longValue(), userId);
         if (qopGroupMember == null) {
             throw new SourceNotFoundException(ResponseMsg.GROUP_NOT_FOUND);
         }
@@ -98,5 +99,19 @@ public class QopGroupServiceImpl implements QopGroupService {
     @Override
     public Page<GroupMemberInfoVo> getGroupMembers(Long groupId, Long userId, Pageable pageable) {
         return qopGroupMemberRepository.findGroupMemberInfoVoPageList(groupId, pageable);
+    }
+
+    @Override
+    public Page<GroupInfoVo> getGroupsById(Long userId, Pageable pageable) {
+        return qopGroupRepository.findMyGroupsByUserId(userId, pageable);
+    }
+
+    @Override
+    public void leaveGroup(Long groupId, Long userId) {
+        QopGroupMember qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, userId);
+        if (GroupRole.GROUP_OWNER.getCode().equals(qopGroupMember.getUserRole())) {
+            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+        }
+        qopGroupMemberRepository.deleteByGroupIdAndUserId(groupId, userId);
     }
 }

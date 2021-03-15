@@ -2,6 +2,9 @@ package cn.edu.zucc.controller;
 
 import cn.edu.zucc.common.vo.ResultPageVo;
 import cn.edu.zucc.common.vo.ResultVo;
+import cn.edu.zucc.constant.ResponseMsg;
+import cn.edu.zucc.exception.FormInfoException;
+import cn.edu.zucc.group.vo.GroupInfoVo;
 import cn.edu.zucc.group.vo.GroupMemberInfoVo;
 import cn.edu.zucc.service.group.impl.QopGroupServiceImpl;
 import cn.edu.zucc.utils.ResponseBuilder;
@@ -35,21 +38,25 @@ public class GroupInfoController {
 
     @ApiOperation("显示加入的组")
     @GetMapping
-    public ResultPageVo<Void> getMyGroups() {
-        return null;
+    public ResultPageVo<GroupInfoVo> getMyGroups(@RequestHeader("Authorization") String token,
+                                                 @RequestParam(name = "page", defaultValue = "1", required = false) Integer page,
+                                                 @RequestParam(name = "size", defaultValue = "10", required = false) Integer size) {
+        return ResponseBuilder.buildSuccessPageableResponse(qopGroupService.getGroupsById(TokenUtils.getUserId(token, tokenSecret, issuer), PageRequest.of(page - 1, size)));
     }
 
     @ApiOperation("显示组成员信息")
     @GetMapping("/members")
-    public ResultPageVo<GroupMemberInfoVo> getGroupMembersInfo(@RequestParam(name = "page", defaultValue = "1", required = false) Integer page,
-                                                               @RequestParam(name = "size", defaultValue = "20", required = false) Integer size,
-                                                               @RequestHeader("Authorization") String token, @RequestParam("groupId") Long groupId) {
+    public ResultPageVo<GroupMemberInfoVo> getGroupMembersInfo(@RequestHeader("Authorization") String token,
+                                                               @RequestParam(name = "page", defaultValue = "1", required = false) Integer page,
+                                                               @RequestParam(name = "size", defaultValue = "10", required = false) Integer size,
+                                                               @RequestParam("groupId") Long groupId) {
         return ResponseBuilder.buildSuccessPageableResponse(qopGroupService.getGroupMembers(groupId, TokenUtils.getUserId(token, tokenSecret, issuer), PageRequest.of(page - 1, size)));
     }
 
     @ApiOperation("邀请加入组")
     @PostMapping("/invite")
     public ResultVo<Void> inviteToGroup() {
+        //todo
         return ResponseBuilder.buildSuccessResponse();
     }
 
@@ -60,8 +67,12 @@ public class GroupInfoController {
     }
 
     @ApiOperation("离开组")
-    @PostMapping("/leave")
-    public ResultVo<Void> leaveGroup() {
+    @PostMapping("/leave/{groupId}")
+    public ResultVo<Void> leaveGroup(@RequestHeader("Authorization") String token, @PathVariable("groupId") Long groupId) {
+        if (groupId == null) {
+            throw new FormInfoException(ResponseMsg.GROUP_NOT_FOUND);
+        }
+        qopGroupService.leaveGroup(groupId, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
 }

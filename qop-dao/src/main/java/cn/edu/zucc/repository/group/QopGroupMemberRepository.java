@@ -25,4 +25,6 @@ public interface QopGroupMemberRepository extends JpaRepository<QopGroupMember, 
             " order by field(m.user_role,'01','02','03')",
             nativeQuery = true)
     Page<GroupMemberInfoVo> findGroupMemberInfoVoPageList(@Param("groupId") Long groupId, Pageable pageable);
+
+    void deleteByGroupIdAndUserId(Long groupId, Long userId);
 }
