@@ -18,6 +18,7 @@ public class QopQuestionnaireVo {
     private Integer answerNum;
     private String description;
     private Date createTime;
+    private Date publishTime;
     private Integer questionNum;
     private List<Question> questions;
 }

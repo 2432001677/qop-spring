@@ -25,6 +25,8 @@ public class QopQuestionnaire {
     private String title;
     @Field("description")
     private String description;
+    @Field("publish_time")
+    private Date publishTime;
     @Field("create_time")
     private Date createTime;
     @Field("delete_time")

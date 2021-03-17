@@ -8,4 +8,4 @@ spring:
         namespace: ${spring.cloud.nacos.config.namespace}
       config:
         file-extension: yaml
-        namespace: dev
+        namespace: @profileActive@

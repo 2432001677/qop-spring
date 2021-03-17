@@ -1,10 +1,8 @@
 package cn.edu.zucc.controller;
 
-import cn.edu.zucc.common.vo.ResultPageVo;
 import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.exception.FormInfoException;
-import cn.edu.zucc.questionnaire.vo.PublishQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QopQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import cn.edu.zucc.service.questionnaire.impl.QuestionnaireServiceImpl;
@@ -14,7 +12,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -33,12 +30,11 @@ public class QuestionnaireController {
     @Value("${jwt.secret}")
     private String tokenSecret;
 
-    @ApiOperation("我的问卷")
-    @GetMapping
-    public ResultPageVo<QuestionnaireInfoVo> getMyQuestionnaires(@RequestHeader("Authorization") String token,
-                                                                 @RequestParam(name = "page", defaultValue = "1", required = false) Integer page,
-                                                                 @RequestParam(name = "size", defaultValue = "10", required = false) Integer size) {
-        return ResponseBuilder.buildSuccessPageableResponse(questionnaireService.getMyQuestionnaires(TokenUtils.getUserId(token, tokenSecret, issuer), PageRequest.of(page - 1, size)));
+    @ApiOperation("问卷")
+    @GetMapping("/{id}")
+    public ResultVo<QopQuestionnaireVo> getQuestionnaire(@RequestHeader("Authorization") String token,
+                                                         @PathVariable("id") String id) {
+        return ResponseBuilder.buildSuccessResponse(questionnaireService.getQuestionnaire(id, token == null ? null : TokenUtils.getUserId(token, tokenSecret, issuer)));
     }
 
     @ApiOperation("创建问卷")
@@ -75,10 +71,10 @@ public class QuestionnaireController {
     }
 
     @ApiOperation("发布问卷")
-    @PostMapping("/publish")
+    @PostMapping("/publish/{id}")
     public ResultVo<Void> publishQuestionnaire(@RequestHeader("Authorization") String token,
-                                               @RequestBody PublishQuestionnaireVo publishQuestionnaireVo) {
-        questionnaireService.publishQuestionnaire(publishQuestionnaireVo, TokenUtils.getUserId(token, tokenSecret, issuer));
+                                               @PathVariable("id") String id) {
+        questionnaireService.publishQuestionnaire(id, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
 

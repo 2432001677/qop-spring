@@ -14,5 +14,6 @@ public class QuestionnaireInfoVo {
     private Integer status;
     private String title;
     private Date createTime;
+    private Date publishTime;
     private Integer questionNum;
 }
