@@ -14,9 +14,9 @@ import cn.edu.zucc.service.account.QopUserService;
 import cn.edu.zucc.utils.CryptUtils;
 import cn.edu.zucc.utils.FormatUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -37,12 +37,12 @@ public class QopUserServiceImpl implements QopUserService {
     }
 
     @Override
-    public Long login(LoginVo loginVo) {
+    public QopUser login(LoginVo loginVo) {
         QopUser qopUser = findUserByUserName(loginVo.getUserName());
         if (!CryptUtils.matchAccountPasswd(qopUser.getPassword(), loginVo.getPassword())) {
             throw new WrongPasswordException();
         }
-        return qopUser.getId();
+        return qopUser;
     }
 
     @Override
@@ -74,19 +74,23 @@ public class QopUserServiceImpl implements QopUserService {
     public void updateProfilesById(AccountProfilesVo accountProfilesVo, Long id) {
         QopUser qopUser = qopUserRepository.getOne(id);
         qopUser.setNickName(accountProfilesVo.getNickName());
+        String phoneNumber = accountProfilesVo.getPhoneNumber();
+        if (!StringUtils.isBlank(phoneNumber)) {
+            if (FormatUtils.isPhoneNumber(phoneNumber)) {
+                qopUser.setPhoneNumber(phoneNumber);
+            } else {
+                throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+            }
+        }
+        String email = accountProfilesVo.getEmail();
+        if (!StringUtils.isBlank(email)) {
+            if (FormatUtils.isEmail(email)) {
+                qopUser.setEmail(email);
+            } else {
+                throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+            }
+        }
         qopUserRepository.save(qopUser);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePhoneNumberById(String phoneNumber, Long id) {
-        qopUserRepository.updatePhoneById(phoneNumber, id);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateEmailById(String email, Long id) {
-        qopUserRepository.updateEmailById(email, id);
     }
 
     @Override

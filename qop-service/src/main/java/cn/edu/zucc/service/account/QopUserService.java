@@ -9,17 +9,13 @@ import cn.edu.zucc.account.vo.RegisterVo;
 public interface QopUserService {
     QopUser addUser(QopUser qopUser);
 
-    Long login(LoginVo loginVo);
+    QopUser login(LoginVo loginVo);
 
     void register(RegisterVo registerVo);
 
     AccountProfilesVo getProfilesById(Long id);
 
     void updateProfilesById(AccountProfilesVo accountProfilesVo, Long id);
-
-    void updatePhoneNumberById(String phoneNumber, Long id);
-
-    void updateEmailById(String email, Long id);
 
     void changePassword(ChangePasswordVo changePasswordVo);
 }

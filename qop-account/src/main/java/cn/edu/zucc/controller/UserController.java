@@ -1,5 +1,6 @@
 package cn.edu.zucc.controller;
 
+import cn.edu.zucc.account.po.QopUser;
 import cn.edu.zucc.account.vo.AccountProfilesVo;
 import cn.edu.zucc.account.vo.ChangePasswordVo;
 import cn.edu.zucc.account.vo.LoginVo;
@@ -11,7 +12,6 @@ import cn.edu.zucc.exception.FormInfoException;
 import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import cn.edu.zucc.service.account.impl.QopUserServiceImpl;
 import cn.edu.zucc.service.questionnaire.impl.QuestionnaireServiceImpl;
-import cn.edu.zucc.utils.FormatUtils;
 import cn.edu.zucc.utils.ResponseBuilder;
 import cn.edu.zucc.utils.TokenProviderUtils;
 import cn.edu.zucc.utils.TokenUtils;
@@ -19,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.PageRequest;
@@ -51,9 +52,16 @@ public class UserController {
 
     @ApiOperation("login")
     @PostMapping("/login")
-    public ResultVo<Void> login(@RequestBody LoginVo loginVo, HttpServletResponse response) {
+    public ResultVo<AccountProfilesVo> login(@RequestBody LoginVo loginVo, HttpServletResponse response) {
         if (loginVo == null || StringUtils.isBlank(loginVo.getUserName()) || StringUtils.isBlank(loginVo.getPassword())) {
-            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR); } response.setHeader("Authorization", TokenProviderUtils.sign(qopUserService.login(loginVo), tokenSecret, issuer)); return ResponseBuilder.buildSuccessResponse(); }
+            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+        }
+        QopUser qopUser = qopUserService.login(loginVo);
+        response.setHeader("Authorization", TokenProviderUtils.sign(qopUser.getId(), tokenSecret, issuer));
+        AccountProfilesVo accountProfilesVo = new AccountProfilesVo();
+        BeanUtils.copyProperties(qopUser, accountProfilesVo);
+        return ResponseBuilder.buildSuccessResponse(accountProfilesVo);
+    }
 
     @ApiOperation("register")
     @PostMapping("/register")
@@ -101,28 +109,6 @@ public class UserController {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
         qopUserService.updateProfilesById(accountProfilesVo, TokenUtils.getUserId(token, tokenSecret, issuer));
-        return ResponseBuilder.buildSuccessResponse();
-    }
-
-    @ApiOperation("更新手机号")
-    @PostMapping("/phone-number/{phoneNumber}")
-    public ResultVo<Void> updateMyPhoneNumber(@RequestHeader("Authorization") String token,
-                                              @PathVariable String phoneNumber) {
-        if (!FormatUtils.isPhoneNumber(phoneNumber)) {
-            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
-        }
-        qopUserService.updatePhoneNumberById(phoneNumber, TokenUtils.getUserId(token, tokenSecret, issuer));
-        return ResponseBuilder.buildSuccessResponse();
-    }
-
-    @ApiOperation("更新邮箱")
-    @PostMapping("/email/{email}")
-    public ResultVo<Void> updateMyEmail(@RequestHeader("Authorization") String token,
-                                        @PathVariable String email) {
-        if (!FormatUtils.isEmail(email)) {
-            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
-        }
-        qopUserService.updateEmailById(email, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
 
