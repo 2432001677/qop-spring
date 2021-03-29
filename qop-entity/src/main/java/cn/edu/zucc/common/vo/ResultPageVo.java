@@ -21,4 +21,5 @@ public class ResultPageVo<T> {
     private Integer page;
     private Integer size;
     private Integer totalPages;
+    private Long totalElements;
 }

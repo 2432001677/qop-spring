@@ -39,6 +39,7 @@ public final class ResponseBuilder {
                 .msg(msg)
                 .data(pageData.getContent())
                 .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
                 .size(pageData.getSize())
                 .page(pageData.getNumber() + 1)
                 .build();

@@ -13,6 +13,7 @@ public class QuestionnaireInfoVo {
     private String id;
     private Integer status;
     private String title;
+    private String description;
     private Date createTime;
     private Date publishTime;
     private Integer questionNum;
