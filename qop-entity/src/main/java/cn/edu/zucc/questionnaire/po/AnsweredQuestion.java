@@ -6,13 +6,15 @@ import java.util.List;
 
 /**
  * @author Bruce
- * @since 03-09-2021
+ * @since 04-10-2021
  */
 @Data
-public class Question {
+public class AnsweredQuestion {
     private Integer qtype;
     private String qtitle;
     private Boolean required;
     private Integer optionNum;
     private List<Object> options;
+    private List<Object> selected;
+    private String content;
 }

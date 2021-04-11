@@ -48,7 +48,7 @@ public class QuestionnaireController {
         return ResponseBuilder.buildSuccessResponse();
     }
 
-    @ApiOperation("更新问卷内容")
+    @ApiOperation("更新问卷")
     @PostMapping("/questions")
     public ResultVo<Void> updateQuestionnaireQuestions(@RequestHeader("Authorization") String token,
                                                        @RequestBody QopQuestionnaireVo qopQuestionnaireVo) {

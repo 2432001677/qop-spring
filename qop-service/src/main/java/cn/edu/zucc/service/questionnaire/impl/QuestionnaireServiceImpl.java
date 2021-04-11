@@ -110,6 +110,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         if (questionnaire == null) {
             throw new SourceNotFoundException(ResponseMsg.QUESTIONNAIRE_NOT_FOUND);
         }
+        questionnaire.setTitle(qopQuestionnaireVo.getTitle());
+        questionnaire.setDescription(questionnaire.getDescription());
         questionnaire.setQuestionNum(qopQuestionnaireVo.getQuestions().size());
         questionnaire.setQuestions(qopQuestionnaireVo.getQuestions());
         qopQuestionnaireRepository.save(questionnaire);

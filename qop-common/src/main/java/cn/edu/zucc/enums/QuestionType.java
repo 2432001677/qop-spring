@@ -6,11 +6,15 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum QuestionType {
-    SINGLE_CHOICE(0,"单选"),
-    MULTIPLE_CHOICE(1,"多选"),
-    BLANK(2,"填空"),
-    TRUE_OR_FALSE(3,"判断"),
-    CASCADE(4,"级联");
+    SINGLE_SELECT(0, "单选"),
+    MULTIPLE_SELECT(1, "多选"),
+    BLANK(2, "填空"),
+    RATES(3, "评分"),
+    CASCADE(4, "级联"),
+    DROP_DOWN_SELECT(5, "下拉"),
+    WEIGHT_ASSIGN(6, "权重"),
+    UPLOAD_FILE(7, "附件"),
+    TRUE_OR_FALSE(8, "判断");
 
     private final int code;
     private final String name;
