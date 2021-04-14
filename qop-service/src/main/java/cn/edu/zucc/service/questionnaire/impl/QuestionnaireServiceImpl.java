@@ -3,9 +3,11 @@ package cn.edu.zucc.service.questionnaire.impl;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.enums.QuestionnaireStatus;
 import cn.edu.zucc.exception.SourceNotFoundException;
+import cn.edu.zucc.group.po.QopGroupQuestionnaire;
 import cn.edu.zucc.questionnaire.po.QopQuestionnaire;
 import cn.edu.zucc.questionnaire.vo.QopQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
+import cn.edu.zucc.repository.group.QopGroupQuestionnaireRepository;
 import cn.edu.zucc.repository.questionnaire.QopQuestionnaireRepository;
 import cn.edu.zucc.service.questionnaire.QuestionnaireService;
 import cn.edu.zucc.utils.ListUtils;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Bruce
@@ -27,6 +30,8 @@ import java.util.Date;
 public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Resource
     private QopQuestionnaireRepository qopQuestionnaireRepository;
+    @Resource
+    private QopGroupQuestionnaireRepository qopGroupQuestionnaireRepository;
 
     @Override
     public QopQuestionnaireVo getQuestionnaire(String id, Long uid) {
@@ -57,6 +62,23 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             return new PageImpl<>(ListUtils.copyListProperties(allByUid.getContent(), QuestionnaireInfoVo::new), pageable, allByUid.getTotalElements());
         }
         return new PageImpl<>(new ArrayList<>(), pageable, allByUid.getTotalElements());
+    }
+
+    @Override
+    public List<QuestionnaireInfoVo> getQuestionnaireByGroupId(Long uid, Long groupId) {
+        // TODO :组权限验证
+        List<QopGroupQuestionnaire> groupQuestionnaires = qopGroupQuestionnaireRepository.findAllByGroupIdOrderByPublishDateDesc(groupId);
+        List<QuestionnaireInfoVo> qopQuestionnaires = new ArrayList<>(20);
+        for (QopGroupQuestionnaire questionnaire : groupQuestionnaires) {
+            QuestionnaireInfoVo questionnaireInfoVo = new QuestionnaireInfoVo();
+            QopQuestionnaire qopQuestionnaire = qopQuestionnaireRepository.findById(questionnaire.getQuestionnaireId()).orElse(null);
+            if (qopQuestionnaire != null) {
+                BeanUtils.copyProperties(qopQuestionnaire, questionnaireInfoVo);
+                questionnaireInfoVo.setPublishTime(questionnaire.getPublishDate());
+            }
+            qopQuestionnaires.add(questionnaireInfoVo);
+        }
+        return qopQuestionnaires;
     }
 
     @Override

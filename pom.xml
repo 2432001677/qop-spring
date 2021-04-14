@@ -132,6 +132,14 @@
         <activeByDefault>true</activeByDefault>
       </activation>
     </profile>
+    <!--windows env-->
+    <profile>
+      <id>win</id>
+      <properties>
+        <profileActive>win</profileActive>
+      </properties>
+    </profile>
+    <!--docker env-->
     <profile>
       <id>test</id>
       <properties>

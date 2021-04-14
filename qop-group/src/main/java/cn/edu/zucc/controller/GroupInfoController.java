@@ -6,7 +6,9 @@ import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.exception.FormInfoException;
 import cn.edu.zucc.group.vo.GroupInfoVo;
 import cn.edu.zucc.group.vo.GroupMemberInfoVo;
+import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import cn.edu.zucc.service.group.impl.QopGroupServiceImpl;
+import cn.edu.zucc.service.questionnaire.impl.QuestionnaireServiceImpl;
 import cn.edu.zucc.utils.ResponseBuilder;
 import cn.edu.zucc.utils.TokenUtils;
 import io.swagger.annotations.Api;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author Bruce
@@ -29,6 +32,8 @@ import javax.annotation.Resource;
 public class GroupInfoController {
     @Resource
     private QopGroupServiceImpl qopGroupService;
+    @Resource
+    private QuestionnaireServiceImpl questionnaireService;
 
     @Value("${jwt.secret}")
     private String tokenSecret;
@@ -74,5 +79,15 @@ public class GroupInfoController {
         }
         qopGroupService.leaveGroup(groupId, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("组内问卷")
+    @GetMapping("/{groupId}/questionnaires")
+    public ResultVo<List<QuestionnaireInfoVo>> getQuestionnairesByGroup(@RequestHeader("Authorization") String token, @PathVariable("groupId") Long groupId) {
+        if (groupId == null) {
+            throw new FormInfoException(ResponseMsg.GROUP_NOT_FOUND);
+        }
+
+        return ResponseBuilder.buildSuccessResponse(questionnaireService.getQuestionnaireByGroupId(TokenUtils.getUserId(token, tokenSecret, issuer), groupId));
     }
 }
