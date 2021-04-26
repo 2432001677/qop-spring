@@ -8,5 +8,7 @@ import lombok.Data;
  */
 @Data
 public class PublishQuestionnaireVo {
-    private String id;
+    private String qid;
+    private Boolean open;
+    private Long groupId;
 }

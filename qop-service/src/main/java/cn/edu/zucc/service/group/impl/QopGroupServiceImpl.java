@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Bruce
@@ -41,17 +42,17 @@ public class QopGroupServiceImpl implements QopGroupService {
         if (groupInfoVo == null || StringUtils.isBlank(groupInfoVo.getGroupName()) || userId == null) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        Date nowDate = new Date();
+        var nowDate = new Date();
 
-        QopGroup qopGroup = new QopGroup();
+        var qopGroup = new QopGroup();
         qopGroup.setName(groupInfoVo.getGroupName());
         qopGroup.setIntroduction(groupInfoVo.getIntroduction());
         qopGroup.setImg(groupInfoVo.getImg());
         qopGroup.setDeleted(CommonConstants.N);
         qopGroup.setCreateDate(nowDate);
-        QopGroup res = qopGroupRepository.save(qopGroup);
+        var res = qopGroupRepository.save(qopGroup);
 
-        QopGroupMember qopGroupMember = new QopGroupMember();
+        var qopGroupMember = new QopGroupMember();
         qopGroupMember.setGroupId(res.getId());
         qopGroupMember.setUserId(userId);
         qopGroupMember.setUserRole(GroupRole.GROUP_OWNER.getCode());
@@ -67,12 +68,12 @@ public class QopGroupServiceImpl implements QopGroupService {
         if (groupInfoVo == null || groupInfoVo.getId() == null || StringUtils.isBlank(groupInfoVo.getGroupName()) || userId == null) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        QopGroupMember qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupInfoVo.getId().longValue(), userId);
+        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupInfoVo.getId().longValue(), userId);
         if (qopGroupMember == null) {
             throw new SourceNotFoundException(ResponseMsg.GROUP_NOT_FOUND);
         }
 
-        QopGroup qopGroup = new QopGroup();
+        var qopGroup = new QopGroup();
         qopGroup.setName(groupInfoVo.getGroupName());
         qopGroup.setIntroduction(groupInfoVo.getIntroduction());
         qopGroup.setImg(groupInfoVo.getImg());
@@ -85,7 +86,7 @@ public class QopGroupServiceImpl implements QopGroupService {
         if (groupId == null) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        QopGroupMember qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, userId);
+        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, userId);
         if (qopGroupMember == null) {
             throw new SourceNotFoundException(ResponseMsg.GROUP_NOT_FOUND);
         }
@@ -102,13 +103,13 @@ public class QopGroupServiceImpl implements QopGroupService {
     }
 
     @Override
-    public Page<GroupInfoVo> getGroupsById(Long userId, Pageable pageable) {
-        return qopGroupRepository.findMyGroupsByUserId(userId, pageable);
+    public List<GroupInfoVo> getGroupsById(Long userId) {
+        return qopGroupRepository.findMyGroupsByUserId(userId);
     }
 
     @Override
     public void leaveGroup(Long groupId, Long userId) {
-        QopGroupMember qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, userId);
+        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, userId);
         if (GroupRole.GROUP_OWNER.getCode().equals(qopGroupMember.getUserRole())) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }

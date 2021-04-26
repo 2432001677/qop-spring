@@ -3,8 +3,8 @@ package cn.edu.zucc.controller;
 import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.exception.FormInfoException;
+import cn.edu.zucc.questionnaire.vo.PublishQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QopQuestionnaireVo;
-import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import cn.edu.zucc.service.questionnaire.impl.QuestionnaireServiceImpl;
 import cn.edu.zucc.utils.ResponseBuilder;
 import cn.edu.zucc.utils.TokenUtils;
@@ -59,22 +59,11 @@ public class QuestionnaireController {
         return ResponseBuilder.buildSuccessResponse();
     }
 
-    @ApiOperation("更新问卷信息")
-    @PostMapping("/update")
-    public ResultVo<Void> updateQuestionnaireInfo(@RequestHeader("Authorization") String token,
-                                                  @RequestBody QuestionnaireInfoVo questionnaireInfoVo) {
-        if (questionnaireInfoVo == null) {
-            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
-        }
-        questionnaireService.updateQuestionnaireInfo(questionnaireInfoVo, TokenUtils.getUserId(token, tokenSecret, issuer));
-        return ResponseBuilder.buildSuccessResponse();
-    }
-
     @ApiOperation("发布问卷")
-    @PostMapping("/publish/{id}")
+    @PostMapping("/publish")
     public ResultVo<Void> publishQuestionnaire(@RequestHeader("Authorization") String token,
-                                               @PathVariable("id") String id) {
-        questionnaireService.publishQuestionnaire(id, TokenUtils.getUserId(token, tokenSecret, issuer));
+                                               @RequestBody PublishQuestionnaireVo publishQuestionnaireVo) {
+        questionnaireService.publishQuestionnaire(publishQuestionnaireVo, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
 

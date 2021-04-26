@@ -14,5 +14,7 @@ public class Question {
     private String qtitle;
     private Boolean required;
     private Integer optionNum;
+    private Integer score;
+    private Integer pass;
     private List<Object> options;
 }

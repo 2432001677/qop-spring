@@ -2,13 +2,13 @@ package cn.edu.zucc.repository.group;
 
 import cn.edu.zucc.group.po.QopGroup;
 import cn.edu.zucc.group.vo.GroupInfoVo;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author Bruce
@@ -25,5 +25,5 @@ public interface QopGroupRepository extends JpaRepository<QopGroup, Long> {
             " where g.id=m.group_id and m.user_id=:userId" +
             " order by m.join_date",
             nativeQuery = true)
-    Page<GroupInfoVo> findMyGroupsByUserId(@Param("userId") Long userId, Pageable pageable);
+    List<GroupInfoVo> findMyGroupsByUserId(@Param("userId") Long userId);
 }

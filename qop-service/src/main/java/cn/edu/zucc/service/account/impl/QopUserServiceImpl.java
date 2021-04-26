@@ -38,7 +38,7 @@ public class QopUserServiceImpl implements QopUserService {
 
     @Override
     public QopUser login(LoginVo loginVo) {
-        QopUser qopUser = findUserByUserName(loginVo.getUserName());
+        var qopUser = findUserByUserName(loginVo.getUserName());
         if (!CryptUtils.matchAccountPasswd(qopUser.getPassword(), loginVo.getPassword())) {
             throw new WrongPasswordException();
         }
@@ -47,9 +47,9 @@ public class QopUserServiceImpl implements QopUserService {
 
     @Override
     public void register(RegisterVo registerVo) {
-        QopUser qopUser = new QopUser();
+        var qopUser = new QopUser();
         BeanUtils.copyProperties(registerVo, qopUser);
-        String userName = registerVo.getUserName();
+        var userName = registerVo.getUserName();
         if (FormatUtils.isEmail(userName)) {
             qopUser.setEmail(userName);
         } else if (FormatUtils.isPhoneNumber(userName)) {
@@ -64,17 +64,17 @@ public class QopUserServiceImpl implements QopUserService {
 
     @Override
     public AccountProfilesVo getProfilesById(Long id) {
-        QopUser qopUser = qopUserRepository.getOne(id);
-        AccountProfilesVo accountProfilesVo = new AccountProfilesVo();
+        var qopUser = qopUserRepository.getOne(id);
+        var accountProfilesVo = new AccountProfilesVo();
         BeanUtils.copyProperties(qopUser, accountProfilesVo);
         return accountProfilesVo;
     }
 
     @Override
     public void updateProfilesById(AccountProfilesVo accountProfilesVo, Long id) {
-        QopUser qopUser = qopUserRepository.getOne(id);
+        var qopUser = qopUserRepository.getOne(id);
         qopUser.setNickName(accountProfilesVo.getNickName());
-        String phoneNumber = accountProfilesVo.getPhoneNumber();
+        var phoneNumber = accountProfilesVo.getPhoneNumber();
         if (!StringUtils.isBlank(phoneNumber)) {
             if (FormatUtils.isPhoneNumber(phoneNumber)) {
                 qopUser.setPhoneNumber(phoneNumber);
@@ -82,7 +82,7 @@ public class QopUserServiceImpl implements QopUserService {
                 throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
             }
         }
-        String email = accountProfilesVo.getEmail();
+        var email = accountProfilesVo.getEmail();
         if (!StringUtils.isBlank(email)) {
             if (FormatUtils.isEmail(email)) {
                 qopUser.setEmail(email);
@@ -95,7 +95,7 @@ public class QopUserServiceImpl implements QopUserService {
 
     @Override
     public void changePassword(ChangePasswordVo changePasswordVo) {
-        QopUser qopUser = findUserByUserName(changePasswordVo.getUserName());
+        var qopUser = findUserByUserName(changePasswordVo.getUserName());
         if (CryptUtils.matchAccountPasswd(qopUser.getPassword(), changePasswordVo.getValidPassword())) {
             qopUser.setPassword(CryptUtils.cryptAccountPasswd(changePasswordVo.getPassword()));
             qopUserRepository.save(qopUser);

@@ -14,6 +14,7 @@ public class QuestionnaireInfoVo {
     private Integer status;
     private String title;
     private String description;
+    private Boolean scoringMode;
     private Date createTime;
     private Date publishTime;
     private Integer questionNum;

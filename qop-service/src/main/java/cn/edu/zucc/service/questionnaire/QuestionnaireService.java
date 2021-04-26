@@ -1,5 +1,6 @@
 package cn.edu.zucc.service.questionnaire;
 
+import cn.edu.zucc.questionnaire.vo.PublishQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QopQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import org.springframework.data.domain.Page;
@@ -16,11 +17,9 @@ public interface QuestionnaireService {
 
     void addQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, Long uid);
 
-    QuestionnaireInfoVo publishQuestionnaire(String id, Long uid);
+    void publishQuestionnaire(PublishQuestionnaireVo publishQuestionnaireVo, Long uid);
 
     void deleteQuestionnaire(String id, Long uid);
-
-    void updateQuestionnaireInfo(QuestionnaireInfoVo questionnaireInfoVo, Long uid);
 
     void updateQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, Long uid);
 }

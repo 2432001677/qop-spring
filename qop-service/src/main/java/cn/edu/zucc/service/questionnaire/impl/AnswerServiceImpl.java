@@ -21,7 +21,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void answerQuestionnaireByUidAndQid(QopAnswerVo qopAnswerVo, Long uid) {
-        QopAnswer qopAnswer = new QopAnswer();
+        var qopAnswer = new QopAnswer();
         BeanUtils.copyProperties(qopAnswerVo, qopAnswer);
         qopAnswer.setAnswerTime(new Date());
         qopAnswer.setAnswererId(uid);

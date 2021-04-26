@@ -27,6 +27,8 @@ public class QopAnswer {
     private String title;
     @Field("description")
     private String description;
+    @Field("scoring_mode")
+    private Boolean scoringMode;
     @Field("answer_time")
     private Date answerTime;
     @Field("delete_time")

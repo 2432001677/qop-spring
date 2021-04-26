@@ -17,6 +17,7 @@ public class QopQuestionnaireVo {
     private String title;
     private Integer answerNum;
     private String description;
+    private Boolean scoringMode;
     private Date createTime;
     private Date publishTime;
     private Integer questionNum;

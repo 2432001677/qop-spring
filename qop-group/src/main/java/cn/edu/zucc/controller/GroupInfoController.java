@@ -4,6 +4,7 @@ import cn.edu.zucc.common.vo.ResultPageVo;
 import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.exception.FormInfoException;
+import cn.edu.zucc.group.vo.CreateInvitationVo;
 import cn.edu.zucc.group.vo.GroupInfoVo;
 import cn.edu.zucc.group.vo.GroupMemberInfoVo;
 import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
@@ -43,10 +44,8 @@ public class GroupInfoController {
 
     @ApiOperation("显示加入的组")
     @GetMapping
-    public ResultPageVo<GroupInfoVo> getMyGroups(@RequestHeader("Authorization") String token,
-                                                 @RequestParam(name = "page", defaultValue = "1", required = false) Integer page,
-                                                 @RequestParam(name = "size", defaultValue = "10", required = false) Integer size) {
-        return ResponseBuilder.buildSuccessPageableResponse(qopGroupService.getGroupsById(TokenUtils.getUserId(token, tokenSecret, issuer), PageRequest.of(page - 1, size)));
+    public ResultVo<List<GroupInfoVo>> getMyGroups(@RequestHeader("Authorization") String token) {
+        return ResponseBuilder.buildSuccessResponse(qopGroupService.getGroupsById(TokenUtils.getUserId(token, tokenSecret, issuer)));
     }
 
     @ApiOperation("显示组成员信息")
@@ -59,8 +58,8 @@ public class GroupInfoController {
     }
 
     @ApiOperation("邀请加入组")
-    @PostMapping("/invite")
-    public ResultVo<Void> inviteToGroup() {
+    @PostMapping("/invitation")
+    public ResultVo<Void> inviteToGroup(@RequestHeader("Authorization") String token, @RequestBody CreateInvitationVo createInvitationVo) {
         //todo
         return ResponseBuilder.buildSuccessResponse();
     }

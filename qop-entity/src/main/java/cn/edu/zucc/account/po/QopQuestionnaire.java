@@ -10,8 +10,8 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "qop_questionaire")
-public class QopQuestionaire {
+@Table(name = "qop_questionnaire")
+public class QopQuestionnaire {
     @Id
     private long id;
 

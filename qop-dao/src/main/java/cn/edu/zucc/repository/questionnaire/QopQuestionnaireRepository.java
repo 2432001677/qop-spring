@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface QopQuestionnaireRepository extends MongoRepository<QopQuestionnaire, String> {
     Page<QopQuestionnaire> findAllByUidAndStatusIsNot(Long uid, Integer status, Pageable pageable);
 
-    QopQuestionnaire findByIdAndStatus(String id, Integer status);
+    QopQuestionnaire findByIdAndStatusIsNot(String id, Integer status);
 
     QopQuestionnaire findByIdAndUid(String id, Long uid);
 }
