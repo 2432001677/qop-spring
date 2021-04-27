@@ -4,9 +4,9 @@ import cn.edu.zucc.common.vo.ResultPageVo;
 import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.exception.FormInfoException;
-import cn.edu.zucc.group.vo.CreateInvitationVo;
 import cn.edu.zucc.group.vo.GroupInfoVo;
 import cn.edu.zucc.group.vo.GroupMemberInfoVo;
+import cn.edu.zucc.group.vo.InvitationVo;
 import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
 import cn.edu.zucc.service.group.impl.QopGroupServiceImpl;
 import cn.edu.zucc.service.questionnaire.impl.QuestionnaireServiceImpl;
@@ -59,8 +59,11 @@ public class GroupInfoController {
 
     @ApiOperation("邀请加入组")
     @PostMapping("/invitation")
-    public ResultVo<Void> inviteToGroup(@RequestHeader("Authorization") String token, @RequestBody CreateInvitationVo createInvitationVo) {
-        //todo
+    public ResultVo<Void> inviteToGroup(@RequestHeader("Authorization") String token, @RequestBody InvitationVo invitationVo) {
+        if (invitationVo == null) {
+            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
+        }
+        qopGroupService.inviteUser(invitationVo, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
 

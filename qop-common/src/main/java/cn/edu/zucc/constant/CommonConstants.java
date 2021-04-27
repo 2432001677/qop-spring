@@ -12,4 +12,6 @@ public final class CommonConstants {
 
     public static final String Y = "Y";
     public static final String N = "N";
+    public static final int SIMPLE_NOTIFICATION = 0;
+    public static final int INVITATION_NOTIFICATION = 1;
 }

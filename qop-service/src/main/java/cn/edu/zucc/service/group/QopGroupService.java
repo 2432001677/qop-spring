@@ -2,6 +2,7 @@ package cn.edu.zucc.service.group;
 
 import cn.edu.zucc.group.vo.GroupInfoVo;
 import cn.edu.zucc.group.vo.GroupMemberInfoVo;
+import cn.edu.zucc.group.vo.InvitationVo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,4 +24,6 @@ public interface QopGroupService {
     List<GroupInfoVo> getGroupsById(Long userId);
 
     void leaveGroup(Long groupId, Long userId);
+
+    void inviteUser(InvitationVo invitationVo, Long userId);
 }
