@@ -1,15 +1,15 @@
 package cn.edu.zucc.service.account.impl;
 
 import cn.edu.zucc.account.po.QopUser;
-import cn.edu.zucc.account.vo.AccountProfilesVo;
-import cn.edu.zucc.account.vo.ChangePasswordVo;
-import cn.edu.zucc.account.vo.LoginVo;
-import cn.edu.zucc.account.vo.RegisterVo;
+import cn.edu.zucc.account.vo.*;
+import cn.edu.zucc.constant.CommonConstants;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.exception.FormInfoException;
 import cn.edu.zucc.exception.SourceNotFoundException;
 import cn.edu.zucc.exception.WrongPasswordException;
 import cn.edu.zucc.repository.account.QopUserRepository;
+import cn.edu.zucc.repository.group.QopGroupRepository;
+import cn.edu.zucc.repository.group.QopNotificationRepository;
 import cn.edu.zucc.service.account.QopUserService;
 import cn.edu.zucc.utils.CryptUtils;
 import cn.edu.zucc.utils.FormatUtils;
@@ -17,9 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Bruce
@@ -30,6 +35,10 @@ import java.util.Date;
 public class QopUserServiceImpl implements QopUserService {
     @Resource
     private QopUserRepository qopUserRepository;
+    @Resource
+    private QopNotificationRepository qopNotificationRepository;
+    @Resource
+    private QopGroupRepository qopGroupRepository;
 
     @Override
     public QopUser addUser(QopUser qopUser) {
@@ -102,6 +111,32 @@ public class QopUserServiceImpl implements QopUserService {
         } else {
             throw new WrongPasswordException();
         }
+    }
+
+    @Override
+    public List<NotificationVo> getNotificationByUserId(Long id) {
+        var qopNotifications = qopNotificationRepository.findAllByUid(id);
+        if (!CollectionUtils.isEmpty(qopNotifications)) {
+            return qopNotifications.stream().map(qopNotification -> {
+                var notificationVo = new NotificationVo();
+                BeanUtils.copyProperties(qopNotification, notificationVo);
+                if (CommonConstants.INVITATION_NOTIFICATION.equals(qopNotification.getType())) {
+                    var info = (Map<String, Object>) qopNotification.getInfo();
+                    var inviterId = (Long) info.get("inviterId");
+                    var groupId = (Long) info.get("groupId");
+                    var invitationInfoVo = InvitationInfoVo
+                            .builder()
+                            .inviterId(inviterId)
+                            .groupId(groupId)
+                            .build();
+                    invitationInfoVo.setGroupName(qopGroupRepository.getOne(groupId).getName());
+                    invitationInfoVo.setInviterName(qopUserRepository.getOne(inviterId).getNickName());
+                    notificationVo.setInfo(invitationInfoVo);
+                }
+                return notificationVo;
+            }).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
     }
 
     private QopUser findUserByUserName(String userName) {

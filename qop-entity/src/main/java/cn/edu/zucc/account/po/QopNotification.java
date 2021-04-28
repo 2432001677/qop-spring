@@ -1,4 +1,4 @@
-package cn.edu.zucc.group.po;
+package cn.edu.zucc.account.po;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

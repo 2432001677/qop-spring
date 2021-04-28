@@ -1,8 +1,10 @@
 package cn.edu.zucc.repository.group;
 
-import cn.edu.zucc.group.po.QopNotification;
+import cn.edu.zucc.account.po.QopNotification;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author Bruce
@@ -10,4 +12,5 @@ import org.springframework.stereotype.Repository;
  **/
 @Repository
 public interface QopNotificationRepository extends MongoRepository<QopNotification,Long> {
+    List<QopNotification> findAllByUid(Long uid);
 }

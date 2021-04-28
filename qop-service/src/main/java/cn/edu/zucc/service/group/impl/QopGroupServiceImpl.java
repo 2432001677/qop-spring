@@ -10,7 +10,7 @@ import cn.edu.zucc.exception.UnAuthorizedException;
 import cn.edu.zucc.group.po.InvitationInfo;
 import cn.edu.zucc.group.po.QopGroup;
 import cn.edu.zucc.group.po.QopGroupMember;
-import cn.edu.zucc.group.po.QopNotification;
+import cn.edu.zucc.account.po.QopNotification;
 import cn.edu.zucc.group.vo.GroupInfoVo;
 import cn.edu.zucc.group.vo.GroupMemberInfoVo;
 import cn.edu.zucc.group.vo.InvitationVo;
@@ -124,7 +124,6 @@ public class QopGroupServiceImpl implements QopGroupService {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
         getMemberByGroupIdAnsUserId(ResponseMsg.REQUEST_INFO_ERROR, groupId, userId);
-        var invitationInfo = new InvitationInfo();
         var userName = invitationVo.getUserName();
         QopUser qopUser;
         if (FormatUtils.isEmail(userName)) {
@@ -137,12 +136,14 @@ public class QopGroupServiceImpl implements QopGroupService {
         if (qopUser == null) {
             throw new SourceNotFoundException(ResponseMsg.NOT_FOUND_USER);
         }
-        invitationInfo.setInviterId(qopUser.getId());
-        invitationInfo.setGroupId(groupId);
         var qopNotification = new QopNotification();
-        qopNotification.setUid(userId);
+        qopNotification.setUid(qopUser.getId());
         qopNotification.setType(CommonConstants.INVITATION_NOTIFICATION);
+        var invitationInfo = new InvitationInfo();
+        invitationInfo.setInviterId(userId);
+        invitationInfo.setGroupId(groupId);
         qopNotification.setInfo(invitationInfo);
+
         qopNotificationRepository.save(qopNotification);
     }
 

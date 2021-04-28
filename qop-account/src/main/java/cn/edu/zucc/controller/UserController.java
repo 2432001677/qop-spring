@@ -1,10 +1,6 @@
 package cn.edu.zucc.controller;
 
-import cn.edu.zucc.account.po.QopUser;
-import cn.edu.zucc.account.vo.AccountProfilesVo;
-import cn.edu.zucc.account.vo.ChangePasswordVo;
-import cn.edu.zucc.account.vo.LoginVo;
-import cn.edu.zucc.account.vo.RegisterVo;
+import cn.edu.zucc.account.vo.*;
 import cn.edu.zucc.common.vo.ResultPageVo;
 import cn.edu.zucc.common.vo.ResultVo;
 import cn.edu.zucc.constant.ResponseMsg;
@@ -27,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author Bruce
@@ -56,9 +53,9 @@ public class UserController {
         if (loginVo == null || StringUtils.isBlank(loginVo.getUserName()) || StringUtils.isBlank(loginVo.getPassword())) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        QopUser qopUser = qopUserService.login(loginVo);
+        var qopUser = qopUserService.login(loginVo);
         response.setHeader("Authorization", TokenProviderUtils.sign(qopUser.getId(), tokenSecret, issuer));
-        AccountProfilesVo accountProfilesVo = new AccountProfilesVo();
+        var accountProfilesVo = new AccountProfilesVo();
         BeanUtils.copyProperties(qopUser, accountProfilesVo);
         return ResponseBuilder.buildSuccessResponse(accountProfilesVo);
     }
@@ -110,6 +107,12 @@ public class UserController {
         }
         qopUserService.updateProfilesById(accountProfilesVo, TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
+    }
+
+    @ApiOperation("获得我的通知")
+    @GetMapping("/notification")
+    public ResultVo<List<NotificationVo>> getMyNotifications(@RequestHeader("Authorization") String token) {
+        return ResponseBuilder.buildSuccessResponse(qopUserService.getNotificationByUserId(TokenUtils.getUserId(token, tokenSecret, issuer)));
     }
 
     @ApiOperation("更新密码")
