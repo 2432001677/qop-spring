@@ -124,4 +124,11 @@ public class UserController {
         qopUserService.changePassword(changePasswordVo);
         return ResponseBuilder.buildSuccessResponse();
     }
+
+    @ApiOperation("回应邀请")
+    @PostMapping("/invitation")
+    public ResultVo<Void> responseInvitation(@RequestHeader("Authorization") String token, @RequestBody ResponseNotificationVo responseNotificationVo) {
+        qopUserService.responseInvitation(responseNotificationVo, TokenUtils.getUserId(token, tokenSecret, issuer));
+        return ResponseBuilder.buildSuccessResponse();
+    }
 }

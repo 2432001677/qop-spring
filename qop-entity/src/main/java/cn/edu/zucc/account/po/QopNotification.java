@@ -18,10 +18,10 @@ public class QopNotification {
     private String id;
     @Field("type")
     private Integer type;
-    @Field("delete_time")
-    private Date deleteTime;
     @Field("uid")
     private Long uid;
     @Field("info")
     private Object info;
+    @Field("create_time")
+    private Date createTime;
 }

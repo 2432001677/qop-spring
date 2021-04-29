@@ -11,6 +11,6 @@ import java.util.List;
  * @since 04-27-2021
  **/
 @Repository
-public interface QopNotificationRepository extends MongoRepository<QopNotification,Long> {
+public interface QopNotificationRepository extends MongoRepository<QopNotification,String> {
     List<QopNotification> findAllByUid(Long uid);
 }

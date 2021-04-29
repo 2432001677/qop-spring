@@ -3,11 +3,13 @@ package cn.edu.zucc.service.questionnaire.impl;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.enums.QuestionnaireStatus;
 import cn.edu.zucc.exception.SourceNotFoundException;
+import cn.edu.zucc.exception.UnAuthorizedException;
 import cn.edu.zucc.group.po.QopGroupQuestionnaire;
 import cn.edu.zucc.questionnaire.po.QopQuestionnaire;
 import cn.edu.zucc.questionnaire.vo.PublishQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QopQuestionnaireVo;
 import cn.edu.zucc.questionnaire.vo.QuestionnaireInfoVo;
+import cn.edu.zucc.repository.group.QopGroupMemberRepository;
 import cn.edu.zucc.repository.group.QopGroupQuestionnaireRepository;
 import cn.edu.zucc.repository.questionnaire.QopQuestionnaireRepository;
 import cn.edu.zucc.service.questionnaire.QuestionnaireService;
@@ -39,6 +41,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     private QopQuestionnaireRepository qopQuestionnaireRepository;
     @Resource
     private QopGroupQuestionnaireRepository qopGroupQuestionnaireRepository;
+    @Resource
+    private QopGroupMemberRepository qopGroupMemberRepository;
 
     @Override
     public QopQuestionnaireVo getQuestionnaire(String id, Long uid) {
@@ -72,7 +76,10 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     @Override
     public List<QuestionnaireInfoVo> getQuestionnaireByGroupId(Long uid, Long groupId) {
-        // TODO :组权限验证
+        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, uid);
+        if (qopGroupMember == null) {
+            throw new UnAuthorizedException(ResponseMsg.NOT_IN_GROUP);
+        }
         var groupQuestionnaires = qopGroupQuestionnaireRepository.findAllByGroupIdOrderByPublishDateDesc(groupId);
         List<QuestionnaireInfoVo> qopQuestionnaires = new ArrayList<>(20);
         for (QopGroupQuestionnaire questionnaire : groupQuestionnaires) {
@@ -110,7 +117,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             qopGroupQuestionnaires.setQuestionnaireId(publishQuestionnaireVo.getQid());
             qopGroupQuestionnaires.setPublishDate(now);
             qopGroupQuestionnaires.setGroupId(publishQuestionnaireVo.getGroupId());
-            // todo 已发布情况
             qopGroupQuestionnaireRepository.save(qopGroupQuestionnaires);
         }
         if (Boolean.TRUE.equals(publishQuestionnaireVo.getOpen()) && !QuestionnaireStatus.PUBLIC.getCode().equals(questionnaire.getStatus())) {

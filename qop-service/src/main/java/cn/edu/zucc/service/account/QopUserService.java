@@ -19,4 +19,6 @@ public interface QopUserService {
     void changePassword(ChangePasswordVo changePasswordVo);
 
     List<NotificationVo> getNotificationByUserId(Long id);
+
+    void responseInvitation(ResponseNotificationVo responseNotificationVo, Long uid);
 }

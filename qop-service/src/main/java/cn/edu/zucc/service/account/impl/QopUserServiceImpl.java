@@ -4,10 +4,14 @@ import cn.edu.zucc.account.po.QopUser;
 import cn.edu.zucc.account.vo.*;
 import cn.edu.zucc.constant.CommonConstants;
 import cn.edu.zucc.constant.ResponseMsg;
+import cn.edu.zucc.enums.GroupRole;
 import cn.edu.zucc.exception.FormInfoException;
 import cn.edu.zucc.exception.SourceNotFoundException;
+import cn.edu.zucc.exception.UnAuthorizedException;
 import cn.edu.zucc.exception.WrongPasswordException;
+import cn.edu.zucc.group.po.QopGroupMember;
 import cn.edu.zucc.repository.account.QopUserRepository;
+import cn.edu.zucc.repository.group.QopGroupMemberRepository;
 import cn.edu.zucc.repository.group.QopGroupRepository;
 import cn.edu.zucc.repository.group.QopNotificationRepository;
 import cn.edu.zucc.service.account.QopUserService;
@@ -17,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -39,6 +44,8 @@ public class QopUserServiceImpl implements QopUserService {
     private QopNotificationRepository qopNotificationRepository;
     @Resource
     private QopGroupRepository qopGroupRepository;
+    @Resource
+    private QopGroupMemberRepository qopGroupMemberRepository;
 
     @Override
     public QopUser addUser(QopUser qopUser) {
@@ -137,6 +144,31 @@ public class QopUserServiceImpl implements QopUserService {
             }).collect(Collectors.toList());
         }
         return new ArrayList<>();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void responseInvitation(ResponseNotificationVo responseNotificationVo, Long uid) {
+        var qopNotification = qopNotificationRepository.findById(responseNotificationVo.getId()).orElse(null);
+        if (qopNotification == null) {
+            throw new SourceNotFoundException(ResponseMsg.NOTIFICATION_EXPIRED);
+        }
+        if (!qopNotification.getUid().equals(uid)) {
+            throw new UnAuthorizedException(ResponseMsg.NOTIFICATION_EXPIRED);
+        }
+        if (CommonConstants.N.equals(responseNotificationVo.getAnswer())) {
+            qopNotificationRepository.deleteById(qopNotification.getId());
+        }
+        if (CommonConstants.Y.equals(responseNotificationVo.getAnswer())) {
+            var info = (Map<String, Object>) qopNotification.getInfo();
+            var qopGroupMember = new QopGroupMember();
+            qopGroupMember.setGroupId((Long) info.get("groupId"));
+            qopGroupMember.setUserRole(GroupRole.GROUP_MEMBER.getCode());
+            qopGroupMember.setJoinDate(new Date());
+            qopGroupMember.setUserId(uid);
+            qopGroupMemberRepository.save(qopGroupMember);
+            qopNotificationRepository.deleteById(qopNotification.getId());
+        }
     }
 
     private QopUser findUserByUserName(String userName) {

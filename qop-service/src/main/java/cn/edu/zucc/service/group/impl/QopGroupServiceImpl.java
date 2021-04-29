@@ -103,6 +103,7 @@ public class QopGroupServiceImpl implements QopGroupService {
 
     @Override
     public Page<GroupMemberInfoVo> getGroupMembers(Long groupId, Long userId, Pageable pageable) {
+        getMemberByGroupIdAnsUserId(ResponseMsg.REQUEST_INFO_ERROR, groupId, userId);
         return qopGroupMemberRepository.findGroupMemberInfoVoPageList(groupId, pageable);
     }
 
@@ -139,6 +140,7 @@ public class QopGroupServiceImpl implements QopGroupService {
         var qopNotification = new QopNotification();
         qopNotification.setUid(qopUser.getId());
         qopNotification.setType(CommonConstants.INVITATION_NOTIFICATION);
+        qopNotification.setCreateTime(new Date());
         var invitationInfo = new InvitationInfo();
         invitationInfo.setInviterId(userId);
         invitationInfo.setGroupId(groupId);
