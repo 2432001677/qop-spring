@@ -20,11 +20,21 @@ public class AnswerServiceImpl implements AnswerService {
     private QopAnswerRepository qopAnswerRepository;
 
     @Override
-    public void answerQuestionnaireByUidAndQid(QopAnswerVo qopAnswerVo, Long uid) {
+    public void answerQuestionnaire(QopAnswerVo qopAnswerVo, Long userId) {
         var qopAnswer = new QopAnswer();
         BeanUtils.copyProperties(qopAnswerVo, qopAnswer);
         qopAnswer.setAnswerTime(new Date());
-        qopAnswer.setAnswererId(uid);
+        qopAnswer.setAnswererId(userId);
+        qopAnswerRepository.save(qopAnswer);
+    }
+
+    @Override
+    public void answerGroupQuestionnaire(Long groupId, QopAnswerVo qopAnswerVo, Long userId) {
+        var qopAnswer = new QopAnswer();
+        BeanUtils.copyProperties(qopAnswerVo, qopAnswer);
+        qopAnswer.setAnswerTime(new Date());
+        qopAnswer.setAnswererId(userId);
+        qopAnswer.setGroupId(groupId);
         qopAnswerRepository.save(qopAnswer);
     }
 }

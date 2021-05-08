@@ -8,17 +8,19 @@ import java.util.List;
 public interface QopUserService {
     QopUser addUser(QopUser qopUser);
 
-    QopUser login(LoginVo loginVo);
+    QopUser login(QopUser qopUser, LoginVo loginVo);
 
     void register(RegisterVo registerVo);
 
     AccountProfilesVo getProfilesById(Long id);
 
-    void updateProfilesById(AccountProfilesVo accountProfilesVo, Long id);
+    void updateProfilesById(AccountProfilesVo accountProfilesVo, Long userId);
 
-    void changePassword(ChangePasswordVo changePasswordVo);
+    void changePassword(QopUser qopUser, ChangePasswordVo changePasswordVo);
 
-    List<NotificationVo> getNotificationByUserId(Long id);
+    List<NotificationVo> getNotificationByUserId(Long userId);
 
-    void responseInvitation(ResponseNotificationVo responseNotificationVo, Long uid);
+    void responseInvitation(ResponseNotificationVo responseNotificationVo, Long userId);
+
+    QopUser findUserByUserName(String userName);
 }

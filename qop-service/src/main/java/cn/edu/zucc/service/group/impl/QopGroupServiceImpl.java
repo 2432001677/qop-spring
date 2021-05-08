@@ -1,16 +1,15 @@
 package cn.edu.zucc.service.group.impl;
 
+import cn.edu.zucc.account.po.QopNotification;
 import cn.edu.zucc.account.po.QopUser;
 import cn.edu.zucc.constant.CommonConstants;
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.enums.GroupRole;
 import cn.edu.zucc.exception.FormInfoException;
 import cn.edu.zucc.exception.SourceNotFoundException;
-import cn.edu.zucc.exception.UnAuthorizedException;
 import cn.edu.zucc.group.po.InvitationInfo;
 import cn.edu.zucc.group.po.QopGroup;
 import cn.edu.zucc.group.po.QopGroupMember;
-import cn.edu.zucc.account.po.QopNotification;
 import cn.edu.zucc.group.vo.GroupInfoVo;
 import cn.edu.zucc.group.vo.GroupMemberInfoVo;
 import cn.edu.zucc.group.vo.InvitationVo;
@@ -74,12 +73,7 @@ public class QopGroupServiceImpl implements QopGroupService {
     }
 
     @Override
-    public void updateGroupInfo(GroupInfoVo groupInfoVo, Long userId) {
-        if (groupInfoVo == null || groupInfoVo.getId() == null || StringUtils.isBlank(groupInfoVo.getGroupName()) || userId == null) {
-            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
-        }
-        getMemberByGroupIdAnsUserId(ResponseMsg.GROUP_NOT_FOUND, groupInfoVo.getId().longValue(), userId);
-
+    public void updateGroupInfo(GroupInfoVo groupInfoVo) {
         var qopGroup = new QopGroup();
         qopGroup.setName(groupInfoVo.getGroupName());
         qopGroup.setIntroduction(groupInfoVo.getIntroduction());
@@ -90,20 +84,12 @@ public class QopGroupServiceImpl implements QopGroupService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteGroup(Long groupId, Long userId) {
-        if (groupId == null) {
-            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
-        }
-        var qopGroupMember = getMemberByGroupIdAnsUserId(ResponseMsg.GROUP_NOT_FOUND, groupId, userId);
-        if (!StringUtils.equals(qopGroupMember.getUserRole(), GroupRole.GROUP_OWNER.getCode())) {
-            throw new UnAuthorizedException(ResponseMsg.NOT_GROUP_OWNER);
-        }
         qopGroupMemberRepository.deleteByGroupId(groupId);
         qopGroupRepository.deleteQopGroup(groupId);
     }
 
     @Override
-    public Page<GroupMemberInfoVo> getGroupMembers(Long groupId, Long userId, Pageable pageable) {
-        getMemberByGroupIdAnsUserId(ResponseMsg.REQUEST_INFO_ERROR, groupId, userId);
+    public Page<GroupMemberInfoVo> getGroupMembers(Long groupId, Pageable pageable) {
         return qopGroupMemberRepository.findGroupMemberInfoVoPageList(groupId, pageable);
     }
 
@@ -114,17 +100,11 @@ public class QopGroupServiceImpl implements QopGroupService {
 
     @Override
     public void leaveGroup(Long groupId, Long userId) {
-        getMemberByGroupIdAnsUserId(ResponseMsg.REQUEST_INFO_ERROR, groupId, userId);
         qopGroupMemberRepository.deleteByGroupIdAndUserId(groupId, userId);
     }
 
     @Override
     public void inviteUser(InvitationVo invitationVo, Long userId) {
-        Long groupId = invitationVo.getGroupId();
-        if (groupId == null) {
-            throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
-        }
-        getMemberByGroupIdAnsUserId(ResponseMsg.REQUEST_INFO_ERROR, groupId, userId);
         var userName = invitationVo.getUserName();
         QopUser qopUser;
         if (FormatUtils.isEmail(userName)) {
@@ -143,13 +123,14 @@ public class QopGroupServiceImpl implements QopGroupService {
         qopNotification.setCreateTime(new Date());
         var invitationInfo = new InvitationInfo();
         invitationInfo.setInviterId(userId);
-        invitationInfo.setGroupId(groupId);
+        invitationInfo.setGroupId(invitationVo.getGroupId());
         qopNotification.setInfo(invitationInfo);
 
         qopNotificationRepository.save(qopNotification);
     }
 
-    private QopGroupMember getMemberByGroupIdAnsUserId(String errMsg, Long groupId, Long userId) {
+    @Override
+    public QopGroupMember checkInMemberInGroup(String errMsg, Long groupId, Long userId) {
         var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, userId);
         if (qopGroupMember == null) {
             throw new FormInfoException(errMsg);

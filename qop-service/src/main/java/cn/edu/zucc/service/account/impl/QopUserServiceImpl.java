@@ -53,8 +53,7 @@ public class QopUserServiceImpl implements QopUserService {
     }
 
     @Override
-    public QopUser login(LoginVo loginVo) {
-        var qopUser = findUserByUserName(loginVo.getUserName());
+    public QopUser login(QopUser qopUser, LoginVo loginVo) {
         if (!CryptUtils.matchAccountPasswd(qopUser.getPassword(), loginVo.getPassword())) {
             throw new WrongPasswordException();
         }
@@ -87,8 +86,8 @@ public class QopUserServiceImpl implements QopUserService {
     }
 
     @Override
-    public void updateProfilesById(AccountProfilesVo accountProfilesVo, Long id) {
-        var qopUser = qopUserRepository.getOne(id);
+    public void updateProfilesById(AccountProfilesVo accountProfilesVo, Long userId) {
+        var qopUser = qopUserRepository.getOne(userId);
         qopUser.setNickName(accountProfilesVo.getNickName());
         var phoneNumber = accountProfilesVo.getPhoneNumber();
         if (!StringUtils.isBlank(phoneNumber)) {
@@ -110,8 +109,7 @@ public class QopUserServiceImpl implements QopUserService {
     }
 
     @Override
-    public void changePassword(ChangePasswordVo changePasswordVo) {
-        var qopUser = findUserByUserName(changePasswordVo.getUserName());
+    public void changePassword(QopUser qopUser, ChangePasswordVo changePasswordVo) {
         if (CryptUtils.matchAccountPasswd(qopUser.getPassword(), changePasswordVo.getValidPassword())) {
             qopUser.setPassword(CryptUtils.cryptAccountPasswd(changePasswordVo.getPassword()));
             qopUserRepository.save(qopUser);
@@ -121,8 +119,8 @@ public class QopUserServiceImpl implements QopUserService {
     }
 
     @Override
-    public List<NotificationVo> getNotificationByUserId(Long id) {
-        var qopNotifications = qopNotificationRepository.findAllByUid(id);
+    public List<NotificationVo> getNotificationByUserId(Long userId) {
+        var qopNotifications = qopNotificationRepository.findAllByUid(userId);
         if (!CollectionUtils.isEmpty(qopNotifications)) {
             return qopNotifications.stream().map(qopNotification -> {
                 var notificationVo = new NotificationVo();
@@ -148,12 +146,12 @@ public class QopUserServiceImpl implements QopUserService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void responseInvitation(ResponseNotificationVo responseNotificationVo, Long uid) {
+    public void responseInvitation(ResponseNotificationVo responseNotificationVo, Long userId) {
         var qopNotification = qopNotificationRepository.findById(responseNotificationVo.getId()).orElse(null);
         if (qopNotification == null) {
             throw new SourceNotFoundException(ResponseMsg.NOTIFICATION_EXPIRED);
         }
-        if (!qopNotification.getUid().equals(uid)) {
+        if (!qopNotification.getUid().equals(userId)) {
             throw new UnAuthorizedException(ResponseMsg.NOTIFICATION_EXPIRED);
         }
         if (CommonConstants.N.equals(responseNotificationVo.getAnswer())) {
@@ -165,13 +163,14 @@ public class QopUserServiceImpl implements QopUserService {
             qopGroupMember.setGroupId((Long) info.get("groupId"));
             qopGroupMember.setUserRole(GroupRole.GROUP_MEMBER.getCode());
             qopGroupMember.setJoinDate(new Date());
-            qopGroupMember.setUserId(uid);
+            qopGroupMember.setUserId(userId);
             qopGroupMemberRepository.save(qopGroupMember);
             qopNotificationRepository.deleteById(qopNotification.getId());
         }
     }
 
-    private QopUser findUserByUserName(String userName) {
+    @Override
+    public QopUser findUserByUserName(String userName) {
         QopUser qopUser = null;
         if (FormatUtils.isEmail(userName)) {
             qopUser = qopUserRepository.getByEmail(userName);

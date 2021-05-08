@@ -53,7 +53,7 @@ public class UserController {
         if (loginVo == null || StringUtils.isBlank(loginVo.getUserName()) || StringUtils.isBlank(loginVo.getPassword())) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        var qopUser = qopUserService.login(loginVo);
+        var qopUser = qopUserService.login(qopUserService.findUserByUserName(loginVo.getUserName()), loginVo);
         response.setHeader("Authorization", TokenProviderUtils.sign(qopUser.getId(), tokenSecret, issuer));
         var accountProfilesVo = new AccountProfilesVo();
         BeanUtils.copyProperties(qopUser, accountProfilesVo);
@@ -121,7 +121,8 @@ public class UserController {
         if (changePasswordVo == null) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        qopUserService.changePassword(changePasswordVo);
+        var qopUser = qopUserService.findUserByUserName(changePasswordVo.getUserName());
+        qopUserService.changePassword(qopUser, changePasswordVo);
         return ResponseBuilder.buildSuccessResponse();
     }
 

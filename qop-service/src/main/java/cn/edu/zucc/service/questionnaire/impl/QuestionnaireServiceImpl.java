@@ -2,6 +2,7 @@ package cn.edu.zucc.service.questionnaire.impl;
 
 import cn.edu.zucc.constant.ResponseMsg;
 import cn.edu.zucc.enums.QuestionnaireStatus;
+import cn.edu.zucc.exception.FormInfoException;
 import cn.edu.zucc.exception.SourceNotFoundException;
 import cn.edu.zucc.exception.UnAuthorizedException;
 import cn.edu.zucc.group.po.QopGroupQuestionnaire;
@@ -66,6 +67,23 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
+    public QopQuestionnaireVo getGroupQuestionnaire(String qid, Long groupId, Long uid) {
+        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, uid);
+        if (qopGroupMember == null) {
+            throw new FormInfoException(ResponseMsg.GROUP_NOT_FOUND);
+        }
+        var qopGroupQuestionnaire = qopGroupQuestionnaireRepository.findByGroupIdAndQuestionnaireId(groupId, qid);
+        if (qopGroupQuestionnaire == null) {
+            throw new SourceNotFoundException(ResponseMsg.QUESTIONNAIRE_NOT_FOUND);
+        }
+        var qopQuestionnaire = qopQuestionnaireRepository.findByIdAndStatusIsNot(qid, QuestionnaireStatus.DELETED.getCode());
+        var qopQuestionnaireVo = new QopQuestionnaireVo();
+        BeanUtils.copyProperties(qopQuestionnaire, qopQuestionnaireVo);
+
+        return qopQuestionnaireVo;
+    }
+
+    @Override
     public Page<QuestionnaireInfoVo> getMyQuestionnaires(Long uid, Pageable pageable) {
         var allByUid = qopQuestionnaireRepository.findAllByUidAndStatusIsNot(uid, QuestionnaireStatus.DELETED.getCode(), pageable);
         if (allByUid.getTotalElements() > 0) {
@@ -75,7 +93,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
-    public List<QuestionnaireInfoVo> getQuestionnaireByGroupId(Long uid, Long groupId) {
+    public List<QuestionnaireInfoVo> getQuestionnaireByGroupId(Long groupId, Long uid) {
         var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, uid);
         if (qopGroupMember == null) {
             throw new UnAuthorizedException(ResponseMsg.NOT_IN_GROUP);

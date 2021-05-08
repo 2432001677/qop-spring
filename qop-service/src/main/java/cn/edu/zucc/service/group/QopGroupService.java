@@ -1,5 +1,6 @@
 package cn.edu.zucc.service.group;
 
+import cn.edu.zucc.group.po.QopGroupMember;
 import cn.edu.zucc.group.vo.GroupInfoVo;
 import cn.edu.zucc.group.vo.GroupMemberInfoVo;
 import cn.edu.zucc.group.vo.InvitationVo;
@@ -15,15 +16,17 @@ import java.util.List;
 public interface QopGroupService {
     GroupInfoVo createOneGroup(GroupInfoVo groupInfoVo, Long userId);
 
-    void updateGroupInfo(GroupInfoVo groupInfoVo, Long userId);
+    void updateGroupInfo(GroupInfoVo groupInfoVo);
 
     void deleteGroup(Long groupId, Long userId);
 
-    Page<GroupMemberInfoVo> getGroupMembers(Long groupId, Long userId, Pageable pageable);
+    Page<GroupMemberInfoVo> getGroupMembers(Long groupId, Pageable pageable);
 
     List<GroupInfoVo> getGroupsById(Long userId);
 
     void leaveGroup(Long groupId, Long userId);
 
     void inviteUser(InvitationVo invitationVo, Long userId);
+
+    QopGroupMember checkInMemberInGroup(String errMsg, Long groupId, Long userId);
 }

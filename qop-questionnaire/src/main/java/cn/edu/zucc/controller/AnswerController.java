@@ -41,7 +41,7 @@ public class AnswerController {
         if (qopAnswerVo == null) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        answerService.answerQuestionnaireByUidAndQid(qopAnswerVo, StringUtils.isBlank(token) ? null : TokenUtils.getUserId(token, tokenSecret, issuer));
+        answerService.answerQuestionnaire(qopAnswerVo, StringUtils.isBlank(token) ? null : TokenUtils.getUserId(token, tokenSecret, issuer));
         return ResponseBuilder.buildSuccessResponse();
     }
 }

@@ -11,9 +11,11 @@ import java.util.List;
 public interface QuestionnaireService {
     QopQuestionnaireVo getQuestionnaire(String id, Long uid);
 
+    QopQuestionnaireVo getGroupQuestionnaire(String qid, Long groupId, Long uid);
+
     Page<QuestionnaireInfoVo> getMyQuestionnaires(Long uid, Pageable pageable);
 
-    List<QuestionnaireInfoVo> getQuestionnaireByGroupId(Long uid, Long groupId);
+    List<QuestionnaireInfoVo> getQuestionnaireByGroupId(Long groupId, Long uid);
 
     void addQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, Long uid);
 

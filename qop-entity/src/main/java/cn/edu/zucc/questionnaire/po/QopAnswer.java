@@ -21,6 +21,8 @@ public class QopAnswer {
     private String questionnaireId;
     @Field("answerer_id")
     private Long answererId;
+    @Field("group_id")
+    private Long groupId;
     @Field("total_score")
     private Double totalScore;
     @Field("title")
