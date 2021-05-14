@@ -16,6 +16,7 @@ public class AnsweredQuestion {
     private Integer optionNum;
     private Integer score;
     private Integer pass;
+    private Integer index;
     private List<Object> options;
     private List<Object> answer;
     private String content;

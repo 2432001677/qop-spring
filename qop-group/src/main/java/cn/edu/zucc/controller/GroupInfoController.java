@@ -43,7 +43,6 @@ public class GroupInfoController {
 
     @Value("${jwt.secret}")
     private String tokenSecret;
-
     @Value("${jwt.issuer}")
     private String issuer;
 
@@ -116,7 +115,6 @@ public class GroupInfoController {
     @ApiOperation("提交组内问卷")
     @PostMapping("/{groupId}/answer")
     public ResultVo<Void> answerGroupQuestionnaire(@RequestHeader("Authorization") String token, @PathVariable("groupId") Long groupId, @RequestBody QopAnswerVo qopAnswerVo) {
-
         Long userId = TokenUtils.getUserId(token, tokenSecret, issuer);
         qopGroupService.checkInMemberInGroup(ResponseMsg.REQUEST_INFO_ERROR, groupId, userId);
         answerService.answerGroupQuestionnaire(groupId, qopAnswerVo, userId);

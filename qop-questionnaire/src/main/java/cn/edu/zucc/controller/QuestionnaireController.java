@@ -55,7 +55,7 @@ public class QuestionnaireController {
         if (qopQuestionnaireVo == null) {
             throw new FormInfoException(ResponseMsg.REQUEST_INFO_ERROR);
         }
-        questionnaireService.updateQuestionnaire(qopQuestionnaireVo, TokenUtils.getUserId(token, tokenSecret, issuer));
+        questionnaireService.updateQuestionnaire(qopQuestionnaireVo, questionnaireService.checkQuestionnaireOwner(qopQuestionnaireVo.getId(), TokenUtils.getUserId(token, tokenSecret, issuer)));
         return ResponseBuilder.buildSuccessResponse();
     }
 
@@ -63,15 +63,15 @@ public class QuestionnaireController {
     @PostMapping("/publish")
     public ResultVo<Void> publishQuestionnaire(@RequestHeader("Authorization") String token,
                                                @RequestBody PublishQuestionnaireVo publishQuestionnaireVo) {
-        questionnaireService.publishQuestionnaire(publishQuestionnaireVo, TokenUtils.getUserId(token, tokenSecret, issuer));
+        questionnaireService.publishQuestionnaire(publishQuestionnaireVo, questionnaireService.checkQuestionnaireOwner(publishQuestionnaireVo.getQid(), TokenUtils.getUserId(token, tokenSecret, issuer)));
         return ResponseBuilder.buildSuccessResponse();
     }
 
     @ApiOperation("删除问卷")
-    @PostMapping("/delete/{id}")
+    @PostMapping("/delete/{qid}")
     public ResultVo<Void> deleteQuestionnaire(@RequestHeader("Authorization") String token,
-                                              @PathVariable("id") String id) {
-        questionnaireService.deleteQuestionnaire(id, TokenUtils.getUserId(token, tokenSecret, issuer));
+                                              @PathVariable("qid") String qid) {
+        questionnaireService.deleteQuestionnaire(questionnaireService.checkQuestionnaireOwner(qid, TokenUtils.getUserId(token, tokenSecret, issuer)));
         return ResponseBuilder.buildSuccessResponse();
     }
 }

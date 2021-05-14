@@ -46,19 +46,19 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     private QopGroupMemberRepository qopGroupMemberRepository;
 
     @Override
-    public QopQuestionnaireVo getQuestionnaire(String id, Long uid) {
-        var questionnaire = qopQuestionnaireRepository.findById(id).orElseThrow(() -> {
+    public QopQuestionnaireVo getQuestionnaire(String qid, Long userId) {
+        var questionnaire = qopQuestionnaireRepository.findById(qid).orElseThrow(() -> {
             throw new SourceNotFoundException(ResponseMsg.QUESTIONNAIRE_NOT_FOUND);
         });
         var qopQuestionnaireVo = new QopQuestionnaireVo();
         BeanUtils.copyProperties(questionnaire, qopQuestionnaireVo);
-        var answerNum = (int) mongoTemplate.count(new Query(Criteria.where("questionnaire_id").is(id)), "qop_answer");
+        var answerNum = (int) mongoTemplate.count(new Query(Criteria.where("questionnaire_id").is(qid)), "qop_answer");
         qopQuestionnaireVo.setAnswerNum(answerNum);
         var status = questionnaire.getStatus();
         if (QuestionnaireStatus.PUBLIC.getCode().equals(status)) {
             return qopQuestionnaireVo;
         } else if (QuestionnaireStatus.DELETED.getCode().equals(status) || QuestionnaireStatus.DRAFT.getCode().equals(status)) {
-            if (questionnaire.getUid().equals(uid)) {
+            if (questionnaire.getUid().equals(userId)) {
                 return qopQuestionnaireVo;
             }
             return null;
@@ -67,8 +67,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
-    public QopQuestionnaireVo getGroupQuestionnaire(String qid, Long groupId, Long uid) {
-        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, uid);
+    public QopQuestionnaireVo getGroupQuestionnaire(String qid, Long groupId, Long userId) {
+        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, userId);
         if (qopGroupMember == null) {
             throw new FormInfoException(ResponseMsg.GROUP_NOT_FOUND);
         }
@@ -84,8 +84,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
-    public Page<QuestionnaireInfoVo> getMyQuestionnaires(Long uid, Pageable pageable) {
-        var allByUid = qopQuestionnaireRepository.findAllByUidAndStatusIsNot(uid, QuestionnaireStatus.DELETED.getCode(), pageable);
+    public Page<QuestionnaireInfoVo> getMyQuestionnaires(Long userId, Pageable pageable) {
+        var allByUid = qopQuestionnaireRepository.findAllByUidAndStatusIsNot(userId, QuestionnaireStatus.DELETED.getCode(), pageable);
         if (allByUid.getTotalElements() > 0) {
             return new PageImpl<>(ListUtils.copyListProperties(allByUid.getContent(), QuestionnaireInfoVo::new), pageable, allByUid.getTotalElements());
         }
@@ -93,8 +93,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
-    public List<QuestionnaireInfoVo> getQuestionnaireByGroupId(Long groupId, Long uid) {
-        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, uid);
+    public List<QuestionnaireInfoVo> getQuestionnaireByGroupId(Long groupId, Long userId) {
+        var qopGroupMember = qopGroupMemberRepository.findQopGroupMemberByGroupIdAndUserId(groupId, userId);
         if (qopGroupMember == null) {
             throw new UnAuthorizedException(ResponseMsg.NOT_IN_GROUP);
         }
@@ -113,10 +113,10 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
-    public void addQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, Long uid) {
+    public void addQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, Long userId) {
         var questionnaire = new QopQuestionnaire();
         BeanUtils.copyProperties(qopQuestionnaireVo, questionnaire);
-        questionnaire.setUid(uid);
+        questionnaire.setUid(userId);
         questionnaire.setQuestionNum(qopQuestionnaireVo.getQuestions().size());
         questionnaire.setCreateTime(new Date());
         qopQuestionnaireRepository.insert(questionnaire);
@@ -124,11 +124,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void publishQuestionnaire(PublishQuestionnaireVo publishQuestionnaireVo, Long uid) {
-        var questionnaire = qopQuestionnaireRepository.findByIdAndUid(publishQuestionnaireVo.getQid(), uid);
-        if (questionnaire == null) {
-            throw new SourceNotFoundException(ResponseMsg.QUESTIONNAIRE_NOT_FOUND);
-        }
+    public void publishQuestionnaire(PublishQuestionnaireVo publishQuestionnaireVo, QopQuestionnaire qopQuestionnaire) {
         var now = new Date();
         if (publishQuestionnaireVo.getGroupId() != null) {
             var qopGroupQuestionnaires = new QopGroupQuestionnaire();
@@ -137,41 +133,42 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             qopGroupQuestionnaires.setGroupId(publishQuestionnaireVo.getGroupId());
             qopGroupQuestionnaireRepository.save(qopGroupQuestionnaires);
         }
-        if (Boolean.TRUE.equals(publishQuestionnaireVo.getOpen()) && !QuestionnaireStatus.PUBLIC.getCode().equals(questionnaire.getStatus())) {
-            questionnaire.setStatus(QuestionnaireStatus.PUBLIC.getCode());
-            questionnaire.setPublishTime(now);
-            qopQuestionnaireRepository.save(questionnaire);
+        if (Boolean.TRUE.equals(publishQuestionnaireVo.getOpen()) && !QuestionnaireStatus.PUBLIC.getCode().equals(qopQuestionnaire.getStatus())) {
+            qopQuestionnaire.setStatus(QuestionnaireStatus.PUBLIC.getCode());
+            qopQuestionnaire.setPublishTime(now);
+            qopQuestionnaireRepository.save(qopQuestionnaire);
         }
-        if (Boolean.FALSE.equals(publishQuestionnaireVo.getOpen()) && QuestionnaireStatus.PUBLIC.getCode().equals(questionnaire.getStatus())) {
-            questionnaire.setStatus(QuestionnaireStatus.DRAFT.getCode());
-            questionnaire.setPublishTime(null);
-            qopQuestionnaireRepository.save(questionnaire);
+        if (Boolean.FALSE.equals(publishQuestionnaireVo.getOpen()) && QuestionnaireStatus.PUBLIC.getCode().equals(qopQuestionnaire.getStatus())) {
+            qopQuestionnaire.setStatus(QuestionnaireStatus.DRAFT.getCode());
+            qopQuestionnaire.setPublishTime(null);
+            qopQuestionnaireRepository.save(qopQuestionnaire);
         }
     }
 
     @Override
-    public void deleteQuestionnaire(String id, Long uid) {
-        var questionnaire = qopQuestionnaireRepository.findByIdAndUid(id, uid);
-        if (questionnaire == null) {
-            throw new SourceNotFoundException(ResponseMsg.QUESTIONNAIRE_NOT_FOUND);
-        }
-        questionnaire.setStatus(QuestionnaireStatus.DELETED.getCode());
-        questionnaire.setPublishTime(null);
-        questionnaire.setDeleteTime(new Date());
-        qopQuestionnaireRepository.save(questionnaire);
+    public void deleteQuestionnaire(QopQuestionnaire qopQuestionnaire) {
+        qopQuestionnaire.setStatus(QuestionnaireStatus.DELETED.getCode());
+        qopQuestionnaire.setPublishTime(null);
+        qopQuestionnaire.setDeleteTime(new Date());
+        qopQuestionnaireRepository.save(qopQuestionnaire);
     }
 
     @Override
-    public void updateQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, Long uid) {
-        var questionnaire = qopQuestionnaireRepository.findByIdAndUid(qopQuestionnaireVo.getId(), uid);
+    public void updateQuestionnaire(QopQuestionnaireVo qopQuestionnaireVo, QopQuestionnaire qopQuestionnaire) {
+        qopQuestionnaire.setTitle(qopQuestionnaireVo.getTitle());
+        qopQuestionnaire.setDescription(qopQuestionnaire.getDescription());
+        qopQuestionnaire.setQuestionNum(qopQuestionnaireVo.getQuestions().size());
+        qopQuestionnaire.setQuestions(qopQuestionnaireVo.getQuestions());
+        qopQuestionnaire.setScoringMode(qopQuestionnaireVo.getScoringMode());
+        qopQuestionnaireRepository.save(qopQuestionnaire);
+    }
+
+    @Override
+    public QopQuestionnaire checkQuestionnaireOwner(String qid, Long userId) {
+        var questionnaire = qopQuestionnaireRepository.findByIdAndUid(qid, userId);
         if (questionnaire == null) {
             throw new SourceNotFoundException(ResponseMsg.QUESTIONNAIRE_NOT_FOUND);
         }
-        questionnaire.setTitle(qopQuestionnaireVo.getTitle());
-        questionnaire.setDescription(questionnaire.getDescription());
-        questionnaire.setQuestionNum(qopQuestionnaireVo.getQuestions().size());
-        questionnaire.setQuestions(qopQuestionnaireVo.getQuestions());
-        questionnaire.setScoringMode(qopQuestionnaireVo.getScoringMode());
-        qopQuestionnaireRepository.save(questionnaire);
+        return questionnaire;
     }
 }
