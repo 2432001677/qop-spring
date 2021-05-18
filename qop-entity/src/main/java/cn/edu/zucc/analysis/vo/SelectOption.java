@@ -11,4 +11,6 @@ public class SelectOption {
     private Integer selectedCount;
     private String text;
     private Double score;
+    private String label;
+    private Integer value;
 }

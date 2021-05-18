@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface QopAnswerRepository extends MongoRepository<QopAnswer, String> {
+    Integer countByQuestionnaireId(String questionnaireId);
 }

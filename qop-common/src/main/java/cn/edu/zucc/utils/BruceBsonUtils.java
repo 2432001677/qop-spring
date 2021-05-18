@@ -18,6 +18,7 @@ import java.util.List;
 public class BruceBsonUtils extends BsonUtils {
     public static final String QTYPE = "qtype";
     public static final String ANSWER = "answer";
+    public static final String INDEX = "index";
 
     private BruceBsonUtils() {
     }
@@ -35,7 +36,7 @@ public class BruceBsonUtils extends BsonUtils {
     }
 
     public static Bson matchIndex(Integer index) {
-        return Aggregates.match(Filters.eq("index", index));
+        return Aggregates.match(Filters.eq(INDEX, index));
     }
 
     public static Bson matchByGroupId(Long groupId) {
@@ -51,9 +52,9 @@ public class BruceBsonUtils extends BsonUtils {
 
     public static Bson projectBlank() {
         return Aggregates.project(
-                new Document("index", "$answered_questions.index")
+                new Document(INDEX, "$answered_questions.index")
                         .append("content", "$answered_questions.content")
-                        .append("qtype", "$answered_questions.qtype")
+                        .append(QTYPE, "$answered_questions.qtype")
         );
     }
 
@@ -67,7 +68,7 @@ public class BruceBsonUtils extends BsonUtils {
 
     public static Bson projectAnswer() {
         return Aggregates.project(
-                new Document("index", "$answered_questions.index")
+                new Document(INDEX, "$answered_questions.index")
                         .append(QTYPE, "$answered_questions.qtype")
                         .append("pass", "$answered_questions.pass")
                         .append(ANSWER, "$answered_questions.answer")
@@ -83,7 +84,7 @@ public class BruceBsonUtils extends BsonUtils {
     }
 
     public static Bson groupAverage() {
-        return Aggregates.group("$index", Accumulators.avg("average_score", "$score"));
+        return Aggregates.group("$" + INDEX, Accumulators.avg("average_score", "$score"));
     }
 
     public static Bson groupCount() {

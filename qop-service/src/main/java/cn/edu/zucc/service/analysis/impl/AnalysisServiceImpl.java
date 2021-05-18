@@ -5,10 +5,9 @@ import cn.edu.zucc.analysis.vo.AnalysisResult;
 import cn.edu.zucc.analysis.vo.SelectOption;
 import cn.edu.zucc.enums.QuestionType;
 import cn.edu.zucc.questionnaire.po.QopQuestionnaire;
+import cn.edu.zucc.repository.questionnaire.QopAnswerRepository;
 import cn.edu.zucc.service.analysis.AnalysisService;
 import cn.edu.zucc.utils.BruceBsonUtils;
-import com.mongodb.client.AggregateIterable;
-import org.bson.Document;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
@@ -26,14 +25,17 @@ public class AnalysisServiceImpl implements AnalysisService {
     public static final String QOP_ANSWER = "qop_answer";
     @Resource
     private MongoTemplate mongoTemplate;
+    @Resource
+    private QopAnswerRepository qopAnswerRepository;
 
     @Override
     public AnalysisResult getAnalysis(QopQuestionnaire qopQuestionnaire) {
-        String qid = qopQuestionnaire.getId();
+        var qid = qopQuestionnaire.getId();
         var analysisResult = new AnalysisResult();
         BeanUtils.copyProperties(qopQuestionnaire, analysisResult);
         analysisResult.setQuestionnaireId(qid);
         analysisResult.setAnalysisFormList(analysisAnswers(qopQuestionnaire));
+        analysisResult.setAnswerCount(qopAnswerRepository.countByQuestionnaireId(qid));
         return analysisResult;
     }
 
@@ -45,7 +47,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             BeanUtils.copyProperties(qopQuestionnaire.getQuestions().get(i), analysisQuestion);
             analysisQuestionList.add(analysisQuestion);
         }
-        AggregateIterable<Document> avgOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getAvgScore(qopQuestionnaire.getId()));
+        var avgOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getAvgScore(qopQuestionnaire.getId()));
         avgOutput.forEach(output -> analysisQuestionList.get(output.getInteger("_id")).setAverageScore(output.getDouble("average_score")));
         for (var i = 0; i < questionNum; i++) {
             var analysisQuestion = analysisQuestionList.get(i);
@@ -60,15 +62,15 @@ public class AnalysisServiceImpl implements AnalysisService {
                 options.add(o);
             });
             if (QuestionType.SINGLE_SELECT.getCode() == qtype || QuestionType.RATES.getCode() == qtype || QuestionType.DROP_DOWN_SELECT.getCode() == qtype || QuestionType.AUDIO.getCode() == qtype) {
-                AggregateIterable<Document> optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getSingleOption(qopQuestionnaire.getId(), i, qtype));
+                var optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getSingleOption(qopQuestionnaire.getId(), i, qtype));
                 optionOutput.forEach(data -> options.get(data.getInteger("_id")).setSelectedCount(data.getInteger("count")));
             } else if (QuestionType.MULTIPLE_SELECT.getCode() == qtype) {
-                AggregateIterable<Document> optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getMultiOption(qopQuestionnaire.getId(), i));
+                var optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getMultiOption(qopQuestionnaire.getId(), i));
                 optionOutput.forEach(data -> options.get(data.getInteger("_id")).setSelectedCount(data.getInteger("count")));
             } else if (QuestionType.BLANK.getCode() == qtype) {
-                AggregateIterable<Document> optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getBlankAnswer(qopQuestionnaire.getId(), i));
+                var optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getBlankAnswer(qopQuestionnaire.getId(), i));
                 optionOutput.forEach(data -> {
-                    SelectOption selectOption = new SelectOption();
+                    var selectOption = new SelectOption();
                     selectOption.setText(data.getString("content"));
                     options.add(selectOption);
                 });

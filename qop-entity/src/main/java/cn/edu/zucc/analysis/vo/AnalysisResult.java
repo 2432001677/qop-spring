@@ -14,5 +14,6 @@ public class AnalysisResult {
     private Double totalScore;
     private String title;
     private Boolean scoringMode;
+    private Integer answerCount;
     private List<AnalysisQuestion> analysisFormList;
 }
