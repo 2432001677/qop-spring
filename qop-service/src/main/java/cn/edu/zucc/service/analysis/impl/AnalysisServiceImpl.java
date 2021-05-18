@@ -65,6 +65,13 @@ public class AnalysisServiceImpl implements AnalysisService {
             } else if (QuestionType.MULTIPLE_SELECT.getCode() == qtype) {
                 AggregateIterable<Document> optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getMultiOption(qopQuestionnaire.getId(), i));
                 optionOutput.forEach(data -> options.get(data.getInteger("_id")).setSelectedCount(data.getInteger("count")));
+            } else if (QuestionType.BLANK.getCode() == qtype) {
+                AggregateIterable<Document> optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getBlankAnswer(qopQuestionnaire.getId(), i));
+                optionOutput.forEach(data -> {
+                    SelectOption selectOption = new SelectOption();
+                    selectOption.setText(data.getString("content"));
+                    options.add(selectOption);
+                });
             } else if (QuestionType.WEIGHT_ASSIGN.getCode() == qtype) {
                 // todo
             }

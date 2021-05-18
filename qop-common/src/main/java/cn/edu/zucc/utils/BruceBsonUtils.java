@@ -49,6 +49,14 @@ public class BruceBsonUtils extends BsonUtils {
         );
     }
 
+    public static Bson projectBlank() {
+        return Aggregates.project(
+                new Document("index", "$answered_questions.index")
+                        .append("content", "$answered_questions.content")
+                        .append("qtype", "$answered_questions.qtype")
+        );
+    }
+
     public static Bson unwindAnswer() {
         return Aggregates.unwind("$answered_questions");
     }
@@ -119,6 +127,16 @@ public class BruceBsonUtils extends BsonUtils {
                 matchIndex(index),
                 unwindOptions(),
                 groupCount()
+        );
+    }
+
+    public static List<Bson> getBlankAnswer(String qid, Integer index) {
+        return Arrays.asList(
+                matchByQid(qid),
+                projectQid(),
+                unwindAnswer(),
+                projectBlank(),
+                matchIndex(index)
         );
     }
 }
