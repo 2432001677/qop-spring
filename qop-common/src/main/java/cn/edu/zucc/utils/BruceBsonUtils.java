@@ -16,8 +16,10 @@ import java.util.List;
  * @since 05-14-2021
  **/
 public class BruceBsonUtils extends BsonUtils {
-    private BruceBsonUtils() {
+    public static final String QTYPE = "qtype";
+    public static final String ANSWER = "answer";
 
+    private BruceBsonUtils() {
     }
 
     public static Bson matchByQid(String qid) {
@@ -25,7 +27,15 @@ public class BruceBsonUtils extends BsonUtils {
     }
 
     public static Bson matchNe(Integer qtype) {
-        return Aggregates.match(Filters.ne("qtype", qtype));
+        return Aggregates.match(Filters.ne(QTYPE, qtype));
+    }
+
+    public static Bson matchEq(Integer qtype) {
+        return Aggregates.match(Filters.in(QTYPE, qtype));
+    }
+
+    public static Bson matchIndex(Integer index) {
+        return Aggregates.match(Filters.eq("index", index));
     }
 
     public static Bson matchByGroupId(Long groupId) {
@@ -43,13 +53,24 @@ public class BruceBsonUtils extends BsonUtils {
         return Aggregates.unwind("$answered_questions");
     }
 
+    public static Bson unwindOptions() {
+        return Aggregates.unwind("$" + ANSWER);
+    }
+
     public static Bson projectAnswer() {
         return Aggregates.project(
                 new Document("index", "$answered_questions.index")
-                        .append("qtype", "$answered_questions.qtype")
+                        .append(QTYPE, "$answered_questions.qtype")
                         .append("pass", "$answered_questions.pass")
-                        .append("answer", "$answered_questions.answer")
+                        .append(ANSWER, "$answered_questions.answer")
                         .append("score", "$answered_questions.score")
+        );
+    }
+
+    public static Bson projectFirstAnswer() {
+        return Aggregates.project(
+                new Document("_id", "$" + QTYPE)
+                        .append(ANSWER, new Document("$arrayElemAt", Arrays.asList("$" + ANSWER, 0)))
         );
     }
 
@@ -57,7 +78,11 @@ public class BruceBsonUtils extends BsonUtils {
         return Aggregates.group("$index", Accumulators.avg("average_score", "$score"));
     }
 
-    public static List<Bson> getBson(String qid) {
+    public static Bson groupCount() {
+        return Aggregates.group("$" + ANSWER, Accumulators.sum("count", 1));
+    }
+
+    public static List<Bson> getAvgScore(String qid) {
         return Arrays.asList(
                 matchByQid(qid),
                 projectQid(),
@@ -68,6 +93,32 @@ public class BruceBsonUtils extends BsonUtils {
                 matchNe(QuestionType.WEIGHT_ASSIGN.getCode()),
                 matchNe(QuestionType.UPLOAD_FILE.getCode()),
                 groupAverage()
+        );
+    }
+
+    public static List<Bson> getSingleOption(String qid, Integer index, Integer qtype) {
+        return Arrays.asList(
+                matchByQid(qid),
+                projectQid(),
+                unwindAnswer(),
+                projectAnswer(),
+                matchEq(qtype),
+                matchIndex(index),
+                projectFirstAnswer(),
+                groupCount()
+        );
+    }
+
+    public static List<Bson> getMultiOption(String qid, Integer index) {
+        return Arrays.asList(
+                matchByQid(qid),
+                projectQid(),
+                unwindAnswer(),
+                projectAnswer(),
+                matchEq(QuestionType.MULTIPLE_SELECT.getCode()),
+                matchIndex(index),
+                unwindOptions(),
+                groupCount()
         );
     }
 }

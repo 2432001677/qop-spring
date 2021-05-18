@@ -2,6 +2,8 @@ package cn.edu.zucc.service.analysis.impl;
 
 import cn.edu.zucc.analysis.vo.AnalysisQuestion;
 import cn.edu.zucc.analysis.vo.AnalysisResult;
+import cn.edu.zucc.analysis.vo.SelectOption;
+import cn.edu.zucc.enums.QuestionType;
 import cn.edu.zucc.questionnaire.po.QopQuestionnaire;
 import cn.edu.zucc.service.analysis.AnalysisService;
 import cn.edu.zucc.utils.BruceBsonUtils;
@@ -21,6 +23,7 @@ import java.util.List;
  **/
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
+    public static final String QOP_ANSWER = "qop_answer";
     @Resource
     private MongoTemplate mongoTemplate;
 
@@ -42,8 +45,31 @@ public class AnalysisServiceImpl implements AnalysisService {
             BeanUtils.copyProperties(qopQuestionnaire.getQuestions().get(i), analysisQuestion);
             analysisQuestionList.add(analysisQuestion);
         }
-        AggregateIterable<Document> avgOutput = mongoTemplate.getCollection("qop_answer").aggregate(BruceBsonUtils.getBson(qopQuestionnaire.getId()));
+        AggregateIterable<Document> avgOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getAvgScore(qopQuestionnaire.getId()));
         avgOutput.forEach(output -> analysisQuestionList.get(output.getInteger("_id")).setAverageScore(output.getDouble("average_score")));
+        for (var i = 0; i < questionNum; i++) {
+            var analysisQuestion = analysisQuestionList.get(i);
+            int qtype = analysisQuestion.getQtype();
+            var question = qopQuestionnaire.getQuestions().get(i);
+            var questionOptions = question.getOptions();
+            var options = new ArrayList<SelectOption>(questionOptions.size());
+            questionOptions.forEach(opt -> {
+                var o = new SelectOption();
+                BeanUtils.copyProperties(opt, o);
+                o.setSelectedCount(0);
+                options.add(o);
+            });
+            if (QuestionType.SINGLE_SELECT.getCode() == qtype || QuestionType.RATES.getCode() == qtype || QuestionType.DROP_DOWN_SELECT.getCode() == qtype || QuestionType.AUDIO.getCode() == qtype) {
+                AggregateIterable<Document> optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getSingleOption(qopQuestionnaire.getId(), i, qtype));
+                optionOutput.forEach(data -> options.get(data.getInteger("_id")).setSelectedCount(data.getInteger("count")));
+            } else if (QuestionType.MULTIPLE_SELECT.getCode() == qtype) {
+                AggregateIterable<Document> optionOutput = mongoTemplate.getCollection(QOP_ANSWER).aggregate(BruceBsonUtils.getMultiOption(qopQuestionnaire.getId(), i));
+                optionOutput.forEach(data -> options.get(data.getInteger("_id")).setSelectedCount(data.getInteger("count")));
+            } else if (QuestionType.WEIGHT_ASSIGN.getCode() == qtype) {
+                // todo
+            }
+            analysisQuestion.setOptions(options);
+        }
         return analysisQuestionList;
     }
 }

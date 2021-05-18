@@ -14,7 +14,7 @@ public enum QuestionType {
     DROP_DOWN_SELECT(5, "下拉"),
     WEIGHT_ASSIGN(6, "权重"),
     UPLOAD_FILE(7, "附件"),
-    TRUE_OR_FALSE(8, "判断");
+    AUDIO(8, "听力");
 
     private final int code;
     private final String name;

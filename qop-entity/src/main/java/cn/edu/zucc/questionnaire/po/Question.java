@@ -1,5 +1,6 @@
 package cn.edu.zucc.questionnaire.po;
 
+import cn.edu.zucc.analysis.vo.SelectOption;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -20,5 +21,5 @@ public class Question {
     @Field("sum_score")
     private Double sumScore;
     private Integer pass;
-    private List<Object> options;
+    private List<SelectOption> options;
 }

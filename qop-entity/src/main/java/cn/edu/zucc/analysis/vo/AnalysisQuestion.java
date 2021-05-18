@@ -16,5 +16,5 @@ public class AnalysisQuestion {
     private Integer answerCount;
     private Double averageScore;
     private Integer pass;
-    private List<Object> options;
+    private List<SelectOption> options;
 }
