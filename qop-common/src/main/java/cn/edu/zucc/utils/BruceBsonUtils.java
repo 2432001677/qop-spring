@@ -19,6 +19,7 @@ public class BruceBsonUtils extends BsonUtils {
     public static final String QTYPE = "qtype";
     public static final String ANSWER = "answer";
     public static final String INDEX = "index";
+    public static final String ANSWERED_QUESTIONS = "answered_questions";
 
     private BruceBsonUtils() {
     }
@@ -46,20 +47,28 @@ public class BruceBsonUtils extends BsonUtils {
     public static Bson projectQid() {
         return Aggregates.project(
                 new Document("_id", "$questionnaire_id")
-                        .append("answered_questions", "$answered_questions")
+                        .append(ANSWERED_QUESTIONS, "$" + ANSWERED_QUESTIONS)
         );
     }
 
     public static Bson projectBlank() {
         return Aggregates.project(
-                new Document(INDEX, "$answered_questions.index")
-                        .append("content", "$answered_questions.content")
-                        .append(QTYPE, "$answered_questions.qtype")
+                new Document(INDEX, "$" + ANSWERED_QUESTIONS + "." + INDEX)
+                        .append("content", "$" + ANSWERED_QUESTIONS + ".content")
+                        .append(QTYPE, "$" + ANSWERED_QUESTIONS + "." + QTYPE)
+        );
+    }
+
+    public static Bson projectWeight() {
+        return Aggregates.project(
+                new Document(INDEX, "$" + ANSWERED_QUESTIONS + "." + INDEX)
+                        .append(ANSWER, "$" + ANSWERED_QUESTIONS + "." + ANSWER)
+                        .append(QTYPE, "$" + ANSWERED_QUESTIONS + "." + QTYPE)
         );
     }
 
     public static Bson unwindAnswer() {
-        return Aggregates.unwind("$answered_questions");
+        return Aggregates.unwind("$" + ANSWERED_QUESTIONS);
     }
 
     public static Bson unwindOptions() {
@@ -68,11 +77,11 @@ public class BruceBsonUtils extends BsonUtils {
 
     public static Bson projectAnswer() {
         return Aggregates.project(
-                new Document(INDEX, "$answered_questions.index")
-                        .append(QTYPE, "$answered_questions.qtype")
-                        .append("pass", "$answered_questions.pass")
-                        .append(ANSWER, "$answered_questions.answer")
-                        .append("score", "$answered_questions.score")
+                new Document(INDEX, "$" + ANSWERED_QUESTIONS + "." + INDEX)
+                        .append(QTYPE, "$" + ANSWERED_QUESTIONS + "." + QTYPE)
+                        .append("pass", "$" + ANSWERED_QUESTIONS + ".pass")
+                        .append(ANSWER, "$" + ANSWERED_QUESTIONS + "." + ANSWER)
+                        .append("score", "$" + ANSWERED_QUESTIONS + ".score")
         );
     }
 
@@ -80,6 +89,19 @@ public class BruceBsonUtils extends BsonUtils {
         return Aggregates.project(
                 new Document("_id", "$" + QTYPE)
                         .append(ANSWER, new Document("$arrayElemAt", Arrays.asList("$" + ANSWER, 0)))
+        );
+    }
+
+    public static Bson projectOptionIndex(Integer optionIndex) {
+        return Aggregates.project(
+                new Document(ANSWER, new Document("$arrayElemAt", Arrays.asList("$" + ANSWER, optionIndex)))
+        );
+    }
+
+    public static Bson projectWeightScore() {
+        return Aggregates.project(
+                new Document("score", "$" + ANSWER + ".score")
+                        .append("weight", "$" + ANSWER + ".weight")
         );
     }
 
@@ -91,6 +113,25 @@ public class BruceBsonUtils extends BsonUtils {
         return Aggregates.group("$" + ANSWER, Accumulators.sum("count", 1));
     }
 
+    public static Bson groupIndexCount() {
+        return Aggregates.group("$" + INDEX, Accumulators.sum("count", 1));
+    }
+
+    public static Bson groupSumScore() {
+        return Aggregates.group("$_id", Accumulators.sum("sum_score", "$score"), Accumulators.sum("sum_weight", "$weight"));
+    }
+
+    public static List<Bson> groupAnswerCount(String qid, Integer index) {
+        return Arrays.asList(
+                matchByQid(qid),
+                projectQid(),
+                unwindAnswer(),
+                projectAnswer(),
+                matchIndex(index),
+                groupIndexCount()
+        );
+    }
+
     public static List<Bson> getAvgScore(String qid) {
         return Arrays.asList(
                 matchByQid(qid),
@@ -98,7 +139,6 @@ public class BruceBsonUtils extends BsonUtils {
                 unwindAnswer(),
                 projectAnswer(),
                 matchNe(QuestionType.BLANK.getCode()),
-                matchNe(QuestionType.RATES.getCode()),
                 matchNe(QuestionType.WEIGHT_ASSIGN.getCode()),
                 matchNe(QuestionType.UPLOAD_FILE.getCode()),
                 groupAverage()
@@ -138,6 +178,19 @@ public class BruceBsonUtils extends BsonUtils {
                 unwindAnswer(),
                 projectBlank(),
                 matchIndex(index)
+        );
+    }
+
+    public static List<Bson> getWeightAnswer(String qid, Integer index, Integer optionIndex) {
+        return Arrays.asList(
+                matchByQid(qid),
+                projectQid(),
+                unwindAnswer(),
+                projectWeight(),
+                matchIndex(index),
+                projectOptionIndex(optionIndex),
+                projectWeightScore(),
+                groupSumScore()
         );
     }
 }
